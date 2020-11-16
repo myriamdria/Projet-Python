@@ -9,6 +9,7 @@ import pandas as pd
 from datetime import datetime
 import calendar
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';')
@@ -104,7 +105,7 @@ def reçu(id):
 #     return(temps)
     
 ###afficher les données du capteur lié au bruit sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1),noise(1))
     plt.legend('capteur 1')
     plt.plot(reçu(i), noise(i))
@@ -112,28 +113,28 @@ plt.title("Capteur bruit")
 plt.show()
 
 ###afficher les données du capteur lié à la température sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1), temp(1))
     plt.plot(reçu(i), temp(i)) 
 plt.title("Capteur temperature")
 plt.show()
 
 ###afficher les données du capteur lié à l'humidité sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1), humidity(1))
     plt.plot(reçu(i), humidity(i)) 
 plt.title("Capteur humidité")
 plt.show()
 
 ###afficher les données du capteur lié à la lumière sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1), lum(1))
     plt.plot(reçu(i), lum(i)) 
 plt.title("Capteur éclairage")
 plt.show()
 
 ###afficher les données du capteur lié au co2 sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1), co2(1))
     plt.plot(reçu(i), co2(i)) 
 plt.title("Capteur qté de O2")
@@ -143,6 +144,7 @@ plt.show()
 # plt.plot(reçu(6), co2(6)) 
 # plt.title("Capteur qté de O2")
 # plt.show()
+
 
 def minimum(Liste):
     mini=Liste[0]
@@ -173,5 +175,26 @@ def variance(Liste):
         v += (i-m)**2
     return(v/len(Liste))
 
-        
-print (minimum(tab.co2))
+def ecarttype(Liste):
+    m=moyenne(Liste)
+    e=0
+    for i in Liste:
+        e+= (i-m)**2
+    return (e/len(Liste))
+
+
+  
+a= 17.27
+b=237.7
+
+def alpha(T,phi):
+    return (((a*T)/(b+T))+ np.ln(phi))
+
+
+def temprose(T,phi):
+    return ((b*alpha(T,phi))/(a-alpha(T,phi)))
+    
+
+def humidex(T,phi):
+    Ta = 25
+    return (Ta+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))      
