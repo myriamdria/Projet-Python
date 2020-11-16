@@ -9,6 +9,7 @@ import pandas as pd
 from datetime import datetime
 import calendar
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';')
@@ -97,6 +98,27 @@ def reçu(id):
             L.append(convtime(tab.sent_at[i]))
     return L
 
+
+# calcul de l'indice humidex (formule avec température de rosée)
+# humidity=humidé relative ????
+
+def alpha(T,H):
+    a=17.27
+    b=237.7
+    return (((a*T)/(b+T))+np.log(H))
+
+def humidex(id):
+    Tair=temp(id)
+    hum=humidity(id)
+    L=[]
+    for i in range (7880):
+        Trosée=(237.7*alpha(Tair[i],hum[i]))/(17.27-alpha(Tair[i],hum[i]))
+        hmdx=Tair[i]+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+Trosée))))-10)
+        L.append(hdmx)
+    return L
+                                                                 
+
+
 # print (reçu(6))
 # print (len(reçu(6)))
 # def duree(id):
@@ -143,6 +165,16 @@ plt.show()
 # plt.plot(reçu(6), co2(6)) 
 # plt.title("Capteur qté de O2")
 # plt.show()
+
+
+###afficher l'indice humidex####
+for i in range (2,6):
+    plt.plot(reçu(1), humidex(1))
+    plt.plot(reçu(i), humidex(i)) 
+plt.title("indice humidex")
+plt.show()
+
+######################################################################################################
 
 def minimum(Liste):
     mini=Liste[0]
