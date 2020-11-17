@@ -177,13 +177,19 @@ def variance(Liste):
     return(v/len(Liste))
 
 def ecarttype(Liste):
-    m=moyenne(Liste)
-    e=0
-    for i in Liste:
-        e+= (i-m)**2
-    return (e/len(Liste))
+    return (variance(Liste)**(1/2))
 
+def covariance(Liste1 , Liste2):
+    if len(Liste1) == len(Liste2):
+        m1= moyenne(Liste1)
+        m2= moyenne(Liste2)
+        S=0
+        for i in range(len(Liste1)):
+            S += (Liste1[i]-m1)*(Liste2[i]-m2)
+    return (S/len(Liste1))
 
+def ind_correlation(Liste1,Liste2):
+    return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
   
 a= 17.27
 b=237.7
