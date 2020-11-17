@@ -176,11 +176,7 @@ def variance(Liste):
     return(v/len(Liste))
 
 def ecarttype(Liste):
-    m=moyenne(Liste)
-    e=0
-    for i in Liste:
-        e+= (i-m)**2
-    return (e/len(Liste))
+    return (sqrt(variance(liste)))
 
 
   
@@ -196,8 +192,7 @@ def temprose(T,phi):
     
 
 def humidex(T,phi):
-    Ta = 25
-    return (Ta+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))     
+    return (T+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))     
 
 
 # calcul de l'indice humidex (formule avec température de rosée)
