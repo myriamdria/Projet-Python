@@ -10,6 +10,22 @@ from datetime import datetime
 import calendar
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+
+
+
+nom_du_script=sys.argv[0]
+action=sys.argv[1]
+if len(sys.argv)==4:
+    variable=sys.argv[2]
+    start_date=convtime2(sys.argv[3])
+    end_date=convtime2(sys.argv[4])
+else len(sys.argv)==5:
+    variable1=sys.argv[2]
+    varible2=sys.arg[3]
+    start_date=convtime2(sys.argv[4])
+    end_date=convtime2(sys.argv[5])
+    
 
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';')
@@ -32,6 +48,11 @@ print (sum(L))
 def convtime(strtime):
     """Converts a string date "YYYY-MM-DD HH;MM;SS" as a time in sec"""
     moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S+02:00')
+    return calendar.timegm(moment.timetuple())
+
+def convtime2(strtime):
+    """Converts a string date "YYYY-MM-DD" as a time in sec"""
+    moment = datetime.strptime(strtime, '%Y-%m-%d')
     return calendar.timegm(moment.timetuple())
 
 # temps=[]
