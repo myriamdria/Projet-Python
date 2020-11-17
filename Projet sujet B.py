@@ -12,36 +12,45 @@ import calendar
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-tab = pd.read_csv('EIVP_KM.csv', sep=';')
+tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
 print (tab)
 
-date= tab.sent_at
-print (date)
+id1=tab[tab['id']==1]
+id1_temperature = id1['temp']
+periode = id1['2019-08-25':'2019-08-26']
+print (id1_temperature)
+print (periode['temp'])
+plt.plot(periode['temp'])
+plt.show()
 
-L=[]
-for j in range (1,7):
-    compteur=0
-    for i in range (7880):
-        if tab.id[i]==j:
-            compteur += 1
-    L.append(compteur)
-print (L)
-print (sum(L))
+# def intervalle(start,end):
+#     intervalle = id1[start:end]
+#     noise = 
+
+# L=[]
+# for j in range (1,7):
+#     compteur=0
+#     for i in range (7880):
+#         if tab.id[i]==j:
+#             compteur += 1
+#     L.append(compteur)
+# print (L)
+# print (sum(L))
 
 def convtime(strtime):
     """Converts a string date "YYYY-MM-DD HH:MM:SS" as a time in sec"""
     moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S+02:00')
     return calendar.timegm(moment.timetuple())
 
-date1= '2019-08-13 00:03:03+02:00'
-date2= '2019-08-13 23:47:54+02:00'
-date_time_obj_1 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S+02:00')
-date_time_obj_2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S+02:00')
+# date1= '2019-08-13 00:03:03+02:00'
+# date2= '2019-08-13 23:47:54+02:00'
+# date_time_obj_1 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S+02:00')
+# date_time_obj_2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S+02:00')
 
-start=convtime(date1)
-end=convtime(date2)
+# start=convtime(date1)
+# end=convtime(date2)
+
 
 # def intervalle(start,end):
 #     temps=[]
@@ -123,9 +132,7 @@ def reçu(id):
 #     return(temps)
     
 ###afficher les données du capteur lié au bruit sur un graphe####
-for i in range (2,7):
-    plt.plot(reçu(1),noise(1))
-    plt.legend('capteur 1')
+for i in range (1,7):
     plt.plot(reçu(i), noise(i))
 plt.title("Capteur bruit")
 plt.show()
@@ -224,3 +231,24 @@ def humidex(T,phi):
     return (Ta+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))
 
 
+#on ajoute une colonne pour notre indice humidex
+tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15 + temprose(tab['temp'],tab['humidity'])))))-10)
+
+
+
+
+#Entrer la variable qui nous intéresse#
+variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
+start_date = '2019-08-23'
+end_date= '2019-08-24'
+
+##Afficher le graphe d'une variable pour nos différents capteurs##
+indice = []
+for i in range(1,7):
+    idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+    indice.append(i)
+    periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+    plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse"
+plt.legend(indice) #légende par numéro de capteur"
+plt.title("Graphe de la donnée choisie en fonction du temps")
+plt.show()
