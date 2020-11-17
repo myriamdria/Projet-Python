@@ -116,7 +116,6 @@ def reçu(id):
         if tab.id[i] == id:
             L.append(convtime(tab.sent_at[i]))
     return L
-
 # print (reçu(6))
 # print (len(reçu(6)))
 # def duree(id):
