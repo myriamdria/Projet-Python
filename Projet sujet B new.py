@@ -16,15 +16,43 @@ import sys
 
 nom_du_script=sys.argv[0]
 action=sys.argv[1]
-if len(sys.argv)==4:
+if len(sys.argv)==5:
     variable=sys.argv[2]
-    start_date=convtime2(sys.argv[3])
-    end_date=convtime2(sys.argv[4])
-else len(sys.argv)==5:
-    variable1=sys.argv[2]
-    varible2=sys.arg[3]
+    numero=int(sys.argv[3])
     start_date=convtime2(sys.argv[4])
     end_date=convtime2(sys.argv[5])
+else len(sys.argv)==6:
+    variable1=sys.argv[2]
+    variable2=sys.arg[3]
+    numero=int(sys.argv[4])
+    start_date=convtime2(sys.argv[5])
+    end_date=convtime2(sys.argv[6])
+    
+    
+if action=='display' and variable=='humidex':
+    print('''L'indice humidex du capteur''', numero, 'est', humidex(numero))
+    for i in range (2,6):
+        plt.plot(reçu(1), humidex(1))
+        plt.plot(reçu(i), humidex(i))
+    plt.title("indice humidex")
+    plt.show()
+
+    
+if action=='displayStat':
+    print('Pour', variable)
+    print('Le minimum est' minimum(variable))
+    print('Le maximum est' maximum(variable))
+    print('La moyenne est' moyenne(variable))
+    print('La variance est' variance(variable))
+    print('''L'ecarttype est''', ecarttype(variable))
+    
+if action=='corélation'
+    
+
+
+    
+    
+
     
 
 
@@ -62,7 +90,7 @@ def convtime2(strtime):
 
 def identite(numero):
     noise=[]
-    temp=[]
+    temperature=[]
     humidity=[]
     lum=[]
     co2=[]
@@ -70,12 +98,12 @@ def identite(numero):
     for i in range (7880):
         if tab.id[i] == numero:
             noise.append(tab.noise[i])
-            temp.append(tab.temp[i])
+            temperature.append(tab.temperature[i])
             humidity.append(tab.humidity[i])
             lum.append(tab.lum[i])
             co2.append(tab.co2[i])
             duree.append(convtime(tab.sent_at[i]))
-    return noise,temp,humidity,lum,co2,duree
+    return noise,temperature,humidity,lum,co2,duree
 
 def noise(id):
     L=[]
@@ -84,11 +112,11 @@ def noise(id):
             L.append(tab.noise[i])
     return L
 
-def temp(id):
+def temperature(id):
     L=[]
     for i in range (7880):
         if tab.id[i] == id:
-            L.append(tab.temp[i])
+            L.append(tab.temperature[i])
     return L
 
 def humidity(id):
@@ -135,8 +163,8 @@ plt.show()
 
 ###afficher les données du capteur lié à la température sur un graphe####
 for i in range (2,7):
-    plt.plot(reçu(1), temp(1))
-    plt.plot(reçu(i), temp(i)) 
+    plt.plot(reçu(1), temperature(1))
+    plt.plot(reçu(i), temperature(i)) 
 plt.title("Capteur temperature")
 plt.show()
 
@@ -225,7 +253,7 @@ def alpha(T,H):
     return (((a*T)/(b+T))+np.log(H))
 
 def humidex(id):
-    Tair=temp(id)
+    Tair=temperature(id)
     hum=humidity(id)
     L=[]
     for i in range (7880):
