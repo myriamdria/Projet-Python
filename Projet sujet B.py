@@ -43,16 +43,16 @@ date_time_obj_2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S+02:00')
 start=convtime(date1)
 end=convtime(date2)
 
-def intervalle(start,end):
-    temps=[]
-    for i in tab.sent_at:
-        date_time_i=datetime.strp(i, '%Y-%m-%d %H:%M:%S+02:00')
-        if i == start:
-            while date_time_i.date() == date_time_obj_1.date():
-                temps.append(i)
-    return temps
+# def intervalle(start,end):
+#     temps=[]
+#     for i in tab.sent_at:
+#         date_time_i=datetime.strptime(i, '%Y-%m-%d %H:%M:%S+02:00')
+#         if i == start:
+#             while date_time_i.date() == date_time_obj_1.date():
+#                 temps.append(i)
+#     return temps
 
-print (intervalle(date1,date2))               
+# print (intervalle(date1,date2))               
 # temps=[]
 # for i in date:
 #     temps.append(convtime(i))
