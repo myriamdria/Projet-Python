@@ -35,6 +35,24 @@ def convtime(strtime):
     moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S+02:00')
     return calendar.timegm(moment.timetuple())
 
+date1= '2019-08-13 00:03:03+02:00'
+date2= '2019-08-13 23:47:54+02:00'
+date_time_obj_1 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S+02:00')
+date_time_obj_2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S+02:00')
+
+start=convtime(date1)
+end=convtime(date2)
+
+def intervalle(start,end):
+    temps=[]
+    for i in tab.sent_at:
+        date_time_i=datetime.strp(i, '%Y-%m-%d %H:%M:%S+02:00')
+        if i == start:
+            while date_time_i.date() == date_time_obj_1.date():
+                temps.append(i)
+    return temps
+
+print (intervalle(date1,date2))               
 # temps=[]
 # for i in date:
 #     temps.append(convtime(i))
@@ -179,14 +197,14 @@ def variance(Liste):
 def ecarttype(Liste):
     return (variance(Liste)**(1/2))
 
-def covariance(Liste1 , Liste2):
+def covariance(Liste1,Liste2):
     if len(Liste1) == len(Liste2):
         m1= moyenne(Liste1)
         m2= moyenne(Liste2)
         S=0
         for i in range(len(Liste1)):
             S += (Liste1[i]-m1)*(Liste2[i]-m2)
-    return (S/len(Liste1))
+        return (S/len(Liste1))
 
 def ind_correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
@@ -205,3 +223,5 @@ def temprose(T,phi):
 def humidex(T,phi):
     Ta = 25
     return (Ta+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))
+
+
