@@ -5,10 +5,12 @@ Created on Tue Nov  3 09:34:18 2020
 @author: myriam.andriamananjaona
 """
 
+
 import pandas as pd
 from datetime import datetime
 import calendar
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';')
@@ -29,8 +31,8 @@ print (L)
 print (sum(L))
 
 def convtime(strtime):
-    """Converts a string date "YYYY-MM-DD HH;MM;SS" as a time in sec"""
-    moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S +0200')
+    """Converts a string date "YYYY-MM-DD HH:MM:SS" as a time in sec"""
+    moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S+02:00')
     return calendar.timegm(moment.timetuple())
 
 # temps=[]
@@ -92,16 +94,10 @@ def co2(id):
 
 def reçu(id):
     L=[]
-    if id == 6:
-        for i in range (7880):
-            if tab.id[i] == id:
-                L.append(convtime(tab.sent_at[i])+ 31540007 + 2628000) #on ajoute une année et un mois pour avoir une même plage horaire que les autres capteurs
-        return L
-    else:
-        for i in range (7880):
-            if tab.id[i] == id:
-                L.append(convtime(tab.sent_at[i]))
-        return L
+    for i in range (7880):
+        if tab.id[i] == id:
+            L.append(convtime(tab.sent_at[i]))
+    return L
 
 # print (reçu(6))
 # print (len(reçu(6)))
@@ -110,41 +106,46 @@ def reçu(id):
 #     return(temps)
     
 ###afficher les données du capteur lié au bruit sur un graphe####
-for i in range (2,6):
+for i in range (2,7):
     plt.plot(reçu(1),noise(1))
     plt.legend('capteur 1')
     plt.plot(reçu(i), noise(i))
 plt.title("Capteur bruit")
 plt.show()
 
-for i in range (2,6):
+###afficher les données du capteur lié à la température sur un graphe####
+for i in range (2,7):
     plt.plot(reçu(1), temp(1))
     plt.plot(reçu(i), temp(i)) 
 plt.title("Capteur temperature")
 plt.show()
 
-for i in range (2,6):
+###afficher les données du capteur lié à l'humidité sur un graphe####
+for i in range (2,7):
     plt.plot(reçu(1), humidity(1))
     plt.plot(reçu(i), humidity(i)) 
 plt.title("Capteur humidité")
 plt.show()
 
-for i in range (2,6):
+###afficher les données du capteur lié à la lumière sur un graphe####
+for i in range (2,7):
     plt.plot(reçu(1), lum(1))
     plt.plot(reçu(i), lum(i)) 
 plt.title("Capteur éclairage")
 plt.show()
 
-for i in range (2,6):
+###afficher les données du capteur lié au co2 sur un graphe####
+for i in range (2,7):
     plt.plot(reçu(1), co2(1))
     plt.plot(reçu(i), co2(i)) 
 plt.title("Capteur qté de O2")
 plt.show()
 
-# plt.plot(reçu(2), co2(2))
-# plt.plot(reçu(4), co2(4)) 
+# plt.plot(reçu(1), co2(1))
+# plt.plot(reçu(6), co2(6)) 
 # plt.title("Capteur qté de O2")
 # plt.show()
+
 
 def minimum(Liste):
     mini=Liste[0]
@@ -167,3 +168,34 @@ def moyenne(Liste):
         S+= i
         compteur+=1
     return (S/compteur)
+
+def variance(Liste):
+    m=moyenne(Liste)
+    v=0
+    for i in Liste:
+        v += (i-m)**2
+    return(v/len(Liste))
+
+def ecarttype(Liste):
+    m=moyenne(Liste)
+    e=0
+    for i in Liste:
+        e+= (i-m)**2
+    return (e/len(Liste))
+
+
+  
+a= 17.27
+b=237.7
+
+def alpha(T,phi):
+    return (((a*T)/(b+T))+ np.ln(phi))
+
+
+def temprose(T,phi):
+    return ((b*alpha(T,phi))/(a-alpha(T,phi)))
+    
+
+def humidex(T,phi):
+    Ta = 25
+    return (Ta+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))
