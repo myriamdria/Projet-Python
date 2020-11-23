@@ -30,6 +30,8 @@ nom_du_script=sys.argv[0]
 action=sys.argv[1]
 if len(sys.argv)==4:
     variable=sys.argv[2]
+if len(sys.argv)==4:
+    variable=sys.argv[2]
     start_date=sys.argv[3]
     end_date=sys.argv[4]
 if len(sys.argv)==5:
