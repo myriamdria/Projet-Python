@@ -36,6 +36,11 @@ plt.legend(indice) #légende par numéro de capteur"
 plt.title("Graphe de la donnée choisie en fonction du temps")
 plt.show()
 
+##Trouver les similarités##
+# def similarite(capteur):
+    
+
+
 
 ##Les valeurs statistiques###
 def minimum(Liste):
@@ -81,6 +86,10 @@ def covariance(Liste1,Liste2):
 
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
+
+print ('ecart type est:', ecarttype(tab[variable]))
+print ('moyenne',moyenne(tab[variable]))
+
 
 id1=tab[tab['id']==1]
 id2=tab[tab['id']==2]
