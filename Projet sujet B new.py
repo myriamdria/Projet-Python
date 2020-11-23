@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov  3 09:34:18 2020
-
-@author: myriam.andriamananjaona
-"""
 
 import pandas as pd
 from datetime import datetime
@@ -13,40 +7,6 @@ import numpy as np
 import sys
 
 
-
-nom_du_script=sys.argv[0]
-action=sys.argv[1]
-if len(sys.argv)==5:
-    variable=sys.argv[2]
-    numero=int(sys.argv[3])
-    start_date=convtime2(sys.argv[4])
-    end_date=convtime2(sys.argv[5])
-else len(sys.argv)==6:
-    variable1=sys.argv[2]
-    variable2=sys.arg[3]
-    numero=int(sys.argv[4])
-    start_date=convtime2(sys.argv[5])
-    end_date=convtime2(sys.argv[6])
-    
-    
-if action=='display' and variable=='humidex':
-    print('''L'indice humidex du capteur''', numero, 'est', humidex(numero))
-    for i in range (2,6):
-        plt.plot(reçu(1), humidex(1))
-        plt.plot(reçu(i), humidex(i))
-    plt.title("indice humidex")
-    plt.show()
-
-    
-if action=='displayStat':
-    print('Pour', variable)
-    print('Le minimum est' minimum(variable))
-    print('Le maximum est' maximum(variable))
-    print('La moyenne est' moyenne(variable))
-    print('La variance est' variance(variable))
-    print('''L'ecarttype est''', ecarttype(variable))
-    
-if action=='corélation'
     
 
 
@@ -244,6 +204,40 @@ def humidex(T,phi):
     return (T+0.5555(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+temprose(T,phi)))))-10))     
 
 
+nom_du_script=sys.argv[0]
+action=sys.argv[1]
+if len(sys.argv)==5:
+    variable=sys.argv[2]
+    numero=int(sys.argv[3])
+    start_date=convtime2(sys.argv[4])
+    end_date=convtime2(sys.argv[5])
+elif len(sys.argv)==6:
+    variable1=sys.argv[2]
+    variable2=sys.arg[3]
+    numero=int(sys.argv[4])
+    start_date=convtime2(sys.argv[5])
+    end_date=convtime2(sys.argv[6])
+    
+    
+if action=='display' and variable=='humidex':
+    print('''L'indice humidex du capteur''', numero, 'est', humidex(numero))
+    for i in range (2,6):
+        plt.plot(reçu(1), humidex(1))
+        plt.plot(reçu(i), humidex(i))
+    plt.title("indice humidex")
+    plt.show()
+
+    
+if action=='displayStat':
+    print('Pour', variable)
+    print('Le minimum est', minimum(tab[variable]))
+    print('Le maximum est', maximum(tab[variable]))
+    print('La moyenne est', moyenne(tab[variable]))
+    print('La variance est', variance(tab[variable]))
+    print('''L'ecarttype est''', ecarttype(tab[variable]))
+    
+# if action=='corrélation':
+
 # calcul de l'indice humidex (formule avec température de rosée)
 # humidity=humidé relative ????
 
@@ -259,7 +253,7 @@ def humidex(id):
     for i in range (7880):
         Trosée=(237.7*alpha(Tair[i],hum[i]))/(17.27-alpha(Tair[i],hum[i]))
         hmdx=Tair[i]+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15+Trosée))))-10)
-        L.append(hdmx)
+        L.append(hmdx)
     return L
 
 
