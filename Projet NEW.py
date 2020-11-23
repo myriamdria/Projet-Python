@@ -1,7 +1,7 @@
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
@@ -22,55 +22,22 @@ tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15
 
 
 #Entrer la variable qui nous intéresse#
-# variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
-# start_date = '2019-08-23'
-# end_date= '2019-08-24'
+variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
+start_date = '2019-08-23'
+end_date= '2019-08-24'
 
-nom_du_script=sys.argv[0]
-action=sys.argv[1]
-if len(sys.argv)==5:
-    variable=sys.argv[2]
-    # numero=int(sys.argv[3])
-    start_date=sys.argv[4]
-    end_date=sys.argv[5]
-elif len(sys.argv)==6:
-    variable1=sys.argv[2]
-    variable2=sys.arg[3]
-    # numero=int(sys.argv[4])
-    start_date=sys.argv[5]
-    end_date=sys.argv[6]
-nom_du_script=sys.argv[0]
-action=sys.argv[1]
-if len(sys.argv)==4:
-    variable=sys.argv[2]
-    start_date=sys.argv[3]
-    end_date=sys.argv[4]
-elif len(sys.argv)==5:
-    variable1=sys.argv[2]
-    variable2=sys.arg[3]
-    start_date=sys.argv[4]
-    end_date=sys.argv[5]
+
 ##Afficher le graphe d'une variable pour nos différents capteurs##
 indice = []
 for i in range(1,7):
     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
     indice.append(i)
     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-    plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse"
+    plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+    plt.plot(idn[variable])
 plt.legend(indice) #légende par numéro de capteur"
-plt.title("Graphe de la donnée choisie en fonction du temps")
+plt.title('Graphe en fonction du temps')
 plt.show()
-
-##Trouver les similarités##
-# def similarite(variable):
-#     point=[]
-#     moy=[]
-#     for i in range(1,7):
-#         idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-#         periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-        
-    
-
 
 
 ##Les valeurs statistiques###
@@ -121,7 +88,37 @@ def correlation(Liste1,Liste2):
 print ('ecart type est:', ecarttype(tab[variable]))
 print ('moyenne',moyenne(tab[variable]))
 
+##Trouver les similarités##
+id1=tab[tab['id']==1]
+id2=tab[tab['id']==2]
+id3=tab[tab['id']==3]
+id4=tab[tab['id']==4]
+id5=tab[tab['id']==5]
+id6=tab[tab['id']==6]   
 
+L=['noise','humidity','lum','temp','co2']
+moy=[] 
+e=[]
+
+for dimension in L:
+    moy=[] 
+    e=[]
+    maxi=[]
+    mini=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6"
+        moy.append(moyenne(idn[dimension]))
+        e.append(ecarttype(idn[dimension]))
+        maxi.append(maximum(idn[dimension]))
+        mini.append(minimum(idn[dimension]))
+        indice.append(i)
+    print ('Pour', dimension)
+    print ('Le maximum', maxi)
+    print ('Le minimum', mini)
+    print ('Les moyennes:', moy)
+    print ('les écart-types', e)
+    
+        
 id1=tab[tab['id']==1]
 id2=tab[tab['id']==2]
 id3=tab[tab['id']==3]
@@ -145,20 +142,5 @@ print ("L'indice de corrélation du capteur 1 entre la température et l'humidit
 # plt.show()
 
 
-    
-# if action=='display' and variable=='humidex':
-#     print('''L'indice humidex du capteur''', numero, 'est', humidex(numero))
-#     for i in range (2,6):
-#         plt.plot(reçu(1), humidex(1))
-#         plt.plot(reçu(i), humidex(i))
-#     plt.title("indice humidex")
-#     plt.show()
 
     
-if action=='displayStat':
-    print('Pour', variable)
-    print('Le minimum est', minimum(tab[variable]))
-    print('Le maximum est', maximum(tab[variable]))
-    print('La moyenne est', moyenne(tab[variable]))
-    print('La variance est', variance(tab[variable]))
-    print('''L'ecarttype est''', ecarttype(tab[variable]))
