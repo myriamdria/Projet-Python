@@ -7,7 +7,7 @@ import numpy as np
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
-
+# print (tab.id)
 a=17.27
 b=237.7
 
@@ -24,7 +24,7 @@ capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6'
 
 
 #Entrer la variable qui nous intéresse#
-variable= 'temp'
+variable= 'humidity'
 variable1= 'temp'
 variable2= 'humidity'
 # variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
@@ -160,7 +160,7 @@ def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque 
         periode = idn[ start_date : end_date ]
         moy1.append(moyenne(periode[dimension]))
     return (moy1)
-# print (moyenne1('temp'))
+# print (moyenne1('co2'))
 
 def median1(dimension):
     med=[]
@@ -179,6 +179,31 @@ def ecarttype1(dimension):
         e.append(ecarttype(periode[dimension]))
     return (e)
 # print (ecarttype1('temp'))
+
+
+
+
+###Trouver les capteurs similaires selon la variable
+dimension='co2' 
+
+
+
+d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(dimension)], 'ecart_type':[i for i in ecarttype1(dimension)], 'mediane':[i for i in median1(dimension)] }
+df = pd.DataFrame(data=d)
+print (df)
+df_sort1= df.id[(df['moyenne']-moyenne(moyenne1(dimension))).abs().argsort()[:2]]
+df_sort2= df.moyenne[(df['moyenne']-moyenne(moyenne1(dimension))).abs().argsort()[:2]]
+# df_sort.id.tolist()
+
+print ('Les capteurs',df_sort1.tolist(), 'sont similaires')
+print ('Avec pour moyennes, respectivement', df_sort2.tolist(), 'pour', dimension)
+
+
+
+
+
+
+#Pour les valeurs
 
 # for dimension in L:
 #     moy_sim = []
@@ -199,24 +224,25 @@ def ecarttype1(dimension):
 #                     similarite.append(j)
 #     print (similarite)            
 
-dimension='temp'             
-moy_sim = []
+            
+# moy_sim = []
 m = moyenne1(dimension)
 me = moyenne(ecarttype1(dimension)) #moyenne des écart-types de la dimension pour chaque capteur
 median = median1(dimension)
-med_sim = []
-similarite= []
+# med_sim = []
+
 for i in range(1,7):
-    for j in range(6):
-    moy_sim.append(m[j])
-    med_sim.append(median[j])
-    similarite.append(i)
-    if (moy_sim[i]- me < m[i+1] < moy_sim[i]+ me) and (med_sim[i] -1 < median[i+1] < med_sim[i] +1):
-        moy_sim.append(m[i+1])
-        med_sim.append(median[i+1])
-        similarite.append(i+1)
-        
-    print (similarite)          
+    moy_sim = []
+    similarite= []
+    med_sim = []
+    for j in range(i+1,6):
+        if (m[i]- me < m[j] < m[i]+ me) :
+            moy_sim.append(m[j])
+            med_sim.append(median[j])
+            similarite.append(j)
+    # print (moy_sim)
+    # print (similarite)
+                  
                 
 ##################
             
