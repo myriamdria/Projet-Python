@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+df = pd.read_csv('EIVP_KM.csv', sep=';')
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
 
@@ -20,48 +21,26 @@ tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15
 
 
 
-
+capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
 #Entrer la variable qui nous intéresse#
 # variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
 # start_date = '2019-08-23'
 # end_date= '2019-08-24'
 
-nom_du_script=sys.argv[0]
-action=sys.argv[1]
-if len(sys.argv)==4:
+print ("Nombre d'arguments:", len(sys.argv), "arguments")
+print ("Liste des arguments:", str(sys.argv))
+
+
+
+if len(sys.argv)==3:
     variable=sys.argv[2]
-if len(sys.argv)==4:
-    variable=sys.argv[2]
-    start_date=sys.argv[3]
-    end_date=sys.argv[4]
-if len(sys.argv)==5:
-    variable1=sys.argv[2]
-    variable2=sys.arg[3]
-    start_date=sys.argv[4]
-    end_date=sys.argv[5]
-
-##Afficher le graphe d'une variable pour nos différents capteurs##
-indice = []
-for i in range(1,7):
-    idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-    indice.append(i)
-    periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-    plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse"
-plt.legend(indice) #légende par numéro de capteur"
-plt.title("Graphe de la donnée choisie en fonction du temps")
-plt.show()
-
-##Trouver les similarités##
-# def similarite(variable):
-#     point=[]
-#     moy=[]
-#     for i in range(1,7):
-#         idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-#         periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-        
-    
-
-
+    if str(sys.argv)[1]=='display':
+        for i in range(1,7):
+            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+            plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse"
+        plt.legend(capteur) #légende par numéro de capteur"
+        plt.title("Graphe de la variable choisie en fonction du temps")
+        plt.show()
 
 ##Les valeurs statistiques###
 def minimum(Liste):
@@ -93,6 +72,13 @@ def variance(Liste):
         v += (i-m)**2
     return(v/len(Liste))
 
+def mediane(Liste):
+    n = len(Liste)
+    if n%2 == 0:
+        return ((Liste[(n//2)-1] + Liste[n//2]) / 2 )
+    else:
+        return (Liste[(n//2)])
+
 def ecarttype(Liste):
     return (variance(Liste)**(1/2))
 
@@ -108,8 +94,45 @@ def covariance(Liste1,Liste2):
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
 
-print ('ecart type est:', ecarttype(tab[variable]))
-print ('moyenne',moyenne(tab[variable]))
+
+    
+if len(sys.argv)==5:
+    variable=sys.argv[2]
+    start_date=sys.argv[3]
+    end_date=sys.argv[4]
+    if str(sys.argv)[1]=='display':
+        for i in range(1,7):
+            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+            periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+            plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse"
+        plt.legend(capteur) #légende par numéro de capteur"
+        plt.title("Graphe de la variable choisie en fonction du temps")
+        plt.show() #Afficher le graphe d'une variable pour nos différents capteurs
+    if str(sys.argv)[1]=='displayStat':
+        id1=tab[tab['id']==1]
+        plt.axhline(y=moyenne(id1[variable]))
+        plt.legend(plt.axhline(y=moyenne(periode[variable])), ['moyenne de la variable'])
+        plt.title('Graphe de notre variable en fonction du temps avec ses valeurs stats')
+        plt.show()
+        print('Pour', variable)
+        print('Le minimum est', minimum(tab[variable]))
+        print('Le maximum est', maximum(tab[variable]))
+        print('La moyenne est', moyenne(tab[variable]))
+        print('La variance est', variance(tab[variable]))
+        print('''L'ecarttype est''', ecarttype(tab[variable]))
+        
+if len(sys.argv)==6:
+    variable1=sys.argv[2]
+    variable2=sys.arg[3]
+    start_date=sys.argv[4]
+    end_date=sys.argv[5]
+    if str(sys.argv)[1] == 'corrélation':
+        id1=tab[tab['id']==1]
+        donnee = id1[start_date:end_date] 
+        print ("l'indice de corrélation entre",variable1, "et", variable2, "est:", correlation(donnee[variable1],donnee[variable2]))
+
+
+##Trouver les similarités##
 
 
 # id1=tab[tab['id']==1]
@@ -135,29 +158,3 @@ print ('moyenne',moyenne(tab[variable]))
 # plt.show()
 
 
-    
-if action=='display':
-    indice = []
-    for i in range(1,7):
-        idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-        indice.append(i)
-        periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-        plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse"
-    plt.legend(indice) #légende par numéro de capteur"
-    plt.title("Graphe de la donnée choisie en fonction du temps")
-    plt.show()
-
-
-    
-if action=='displayStat':
-    print('Pour', variable)
-    print('Le minimum est', minimum(tab[variable]))
-    print('Le maximum est', maximum(tab[variable]))
-    print('La moyenne est', moyenne(tab[variable]))
-    print('La variance est', variance(tab[variable]))
-    print('''L'ecarttype est''', ecarttype(tab[variable]))
-          
-if action == 'corrélation':
-    id1=tab[tab['id']==1]
-    donnee = id1[start_date:end_date] 
-    print ("l'indice de corrélation entre",variable1, "et", variable2, "est:", correlation(donnee[variable1],donnee[variable2]))
