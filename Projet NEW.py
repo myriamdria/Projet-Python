@@ -2,6 +2,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+# from datetime import datetime
+# import calendar
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
@@ -18,27 +20,38 @@ def temprose(T,humid):
 #on ajoute une colonne pour notre indice humidex
 tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15 + temprose(tab['temp'],tab['humidity'])))))-10)
 
-
+capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
 
 
 #Entrer la variable qui nous intéresse#
-variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
-start_date = '2019-08-23'
-end_date= '2019-08-24'
+variable= 'temp'
+variable1= 'temp'
+variable2= 'humidity'
+# variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
+start_date = '2019-08-12'
+end_date= '2019-08-13'
 
+
+# def convtime2(strtime):
+#     """Converts a string date "YYYY-MM-DD" as a time in sec"""
+#     moment = datetime.strptime(strtime, '%Y-%m-%d')
+#     return calendar.timegm(moment.timetuple())
 
 ##Afficher le graphe d'une variable pour nos différents capteurs##
-indice = []
 for i in range(1,7):
     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-    indice.append(i)
     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
     plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-    plt.plot(idn[variable])
-plt.legend(indice) #légende par numéro de capteur"
+plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
 plt.title('Graphe en fonction du temps')
 plt.show()
 
+for i in range(1,7):
+    idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+    plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+plt.title('Graphe en fonction du temps')
+plt.show()
 
 ##Les valeurs statistiques###
 def minimum(Liste):
@@ -59,7 +72,7 @@ def moyenne(Liste):
     S=0
     compteur=0
     for i in Liste:
-        S+= i
+        S = S + i
         compteur+=1
     return (S/compteur)
 
@@ -70,6 +83,13 @@ def variance(Liste):
         v += (i-m)**2
     return(v/len(Liste))
 
+def mediane(Liste):
+    n = len(Liste)
+    if n%2 == 0:
+        return ((Liste[(n//2)-1] + Liste[n//2]) / 2 )
+    else:
+        return (Liste[(n//2)])
+    
 def ecarttype(Liste):
     return (variance(Liste)**(1/2))
 
@@ -85,40 +105,135 @@ def covariance(Liste1,Liste2):
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
 
-print ('ecart type est:', ecarttype(tab[variable]))
-print ('moyenne',moyenne(tab[variable]))
+# print ('ecart type est:', ecarttype(tab[variable]))
+# print ('moyenne',moyenne(tab[variable]))
 
 ##Trouver les similarités##
-id1=tab[tab['id']==1]
-id2=tab[tab['id']==2]
-id3=tab[tab['id']==3]
-id4=tab[tab['id']==4]
-id5=tab[tab['id']==5]
-id6=tab[tab['id']==6]   
 
 L=['noise','humidity','lum','temp','co2']
-moy=[] 
-e=[]
 
-for dimension in L:
-    moy=[] 
-    e=[]
-    maxi=[]
-    mini=[]
+# for dimension in L:
+#     moy=[] 
+#     e=[]
+#     maxi=[]
+#     mini=[]
+#     median=[]
+#     for i in range(1,7):
+#         idn = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6"
+#         periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+#         moy.append(moyenne(periode[dimension]))
+#         e.append(ecarttype(periode[dimension]))
+#         maxi.append(maximum(periode[dimension]))
+#         mini.append(minimum(periode[dimension]))
+#         median.append(mediane(periode[dimension]))
+#     print ('Pour', dimension)
+#     print ('Le maximum', maxi)
+#     print ('Le minimum', mini)
+#     print ('Les moyennes:', moy)
+#     print ('les écart-types', e)
+#     print ('La médiane', median)
+
+# for dimension in L:
+#     moy=[] 
+#     e=[]
+#     maxi=[]
+#     mini=[]
+#     median=[]
+#     for i in range(1,7):
+#         idn = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6"
+#         moy.append(moyenne(idn[dimension]))
+#         e.append(ecarttype(idn[dimension]))
+#         maxi.append(maximum(idn[dimension]))
+#         mini.append(minimum(idn[dimension]))
+#         median.append(mediane(idn[dimension]))
+#     print ('Pour', dimension)
+#     print ('Le maximum', maxi)
+#     print ('Le minimum', mini)
+#     print ('Les moyennes:', moy)
+#     print ('les écart-types', e)
+#     print ('La médiane', median)
+                
+def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque capteur
+    moy1=[]
     for i in range(1,7):
-        idn = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6"
-        moy.append(moyenne(idn[dimension]))
-        e.append(ecarttype(idn[dimension]))
-        maxi.append(maximum(idn[dimension]))
-        mini.append(minimum(idn[dimension]))
-        indice.append(i)
-    print ('Pour', dimension)
-    print ('Le maximum', maxi)
-    print ('Le minimum', mini)
-    print ('Les moyennes:', moy)
-    print ('les écart-types', e)
-    
+        idn = tab[tab['id'] == i]
+        periode = idn[ start_date : end_date ]
+        moy1.append(moyenne(periode[dimension]))
+    return (moy1)
+# print (moyenne1('temp'))
+
+def median1(dimension):
+    med=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[ start_date : end_date ]
+        med.append(mediane(periode[dimension]))
+    return (med)
+# print (median1('temp'))
+
+def ecarttype1(dimension):
+    e=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[ start_date : end_date ]
+        e.append(ecarttype(periode[dimension]))
+    return (e)
+# print (ecarttype1('temp'))
+
+# for dimension in L:
+#     moy_sim = []
+#     m = moyenne1(dimension)
+#     me = moyenne(ecarttype1(dimension)) #moyenne des écart-types de la dimension pour chaque capteur
+#     median = median1(dimension)
+#     med_sim = []
+#     similarite= []
+#     for i in range(6):
+#         moy_sim.append(m[i])
+#         med_sim.append(median[i])
+#         similarite.append(i)
+#         for j in range(6):
+#             if i != j:
+#                 if (moy_sim[i]- me < m[j] < moy_sim[i]+ me) and (med_sim[i] -1 < median[j] < med_sim[i] +1):
+#                     moy_sim.append(m[j])
+#                     med_sim.append(median[j])
+#                     similarite.append(j)
+#     print (similarite)            
+
+dimension='temp'             
+moy_sim = []
+m = moyenne1(dimension)
+me = moyenne(ecarttype1(dimension)) #moyenne des écart-types de la dimension pour chaque capteur
+median = median1(dimension)
+med_sim = []
+similarite= []
+for i in range(1,7):
+    for j in range(6):
+    moy_sim.append(m[j])
+    med_sim.append(median[j])
+    similarite.append(i)
+    if (moy_sim[i]- me < m[i+1] < moy_sim[i]+ me) and (med_sim[i] -1 < median[i+1] < med_sim[i] +1):
+        moy_sim.append(m[i+1])
+        med_sim.append(median[i+1])
+        similarite.append(i+1)
         
+    print (similarite)          
+                
+##################
+            
+    
+
+# for i in range(1,7):
+#     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+#     plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse"
+#     plt.title("Graphe")
+#     plt.axhline(moyenne(idn[variable]))
+#     plt.show() 
+# plt.legend(capteur) #légende par numéro de capteur"
+
+# plt.title("Graphe de notre variable en fonction du temps avec ses valeurs stats")
+
+# plt.show()       
+ 
 id1=tab[tab['id']==1]
 id2=tab[tab['id']==2]
 id3=tab[tab['id']==3]
@@ -127,7 +242,10 @@ id5=tab[tab['id']==5]
 id6=tab[tab['id']==6]   
 
 donnee = id1[start_date:end_date] 
-print ("L'indice de corrélation du capteur 1 entre la température et l'humidité est:",correlation(donnee['temp'],donnee['humidity']))
+print ("l'indice de corrélation entre",variable1, "et", variable2, "est:",correlation(donnee[variable1],donnee[variable2]))
+
+# print (moyenne(donnee[variable1]))
+
 # print (correlation(id1['temp'],id1['humidity']))
 
 # id1_temperature = id1['temp']
