@@ -61,7 +61,6 @@ tf2.drop_duplicates(subset='date', keep='last', inplace=True)#on supprime
 print ('Les périodes doccupations de bureaux')
 print ('Les journées commencent à :')
 print (tf1)
-
 print ('Puis se terminent à:')
 print (tf2)
 
@@ -80,7 +79,7 @@ print (tf2)
 #         plt.xlabel('date')
 #         plt.show()
 
-variable='lum'
+variable='noise'
 start_date ='2019-08-13'
 end_date = '2019-08-14'
 
@@ -160,9 +159,6 @@ def covariance(Liste1,Liste2):
 
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
-
-# print ('ecart type est:', ecarttype(tab[variable]))
-# print ('moyenne',moyenne(tab[variable]))
 
 
 ###Fonctions permettant de créer une liste de nos données statistiques de chaque
