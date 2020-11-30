@@ -94,7 +94,49 @@ def covariance(Liste1,Liste2):
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
 
+def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque capteur
+    moy1=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        moy1.append(moyenne(periode[dimension]))
+    return (moy1)
+# print (moyenne1(variable))
 
+def median1(dimension):
+    med=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        med.append(mediane(periode[dimension]))
+    return (med)
+# print (median1(variable))
+
+def ecarttype1(dimension):
+    e=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        e.append(ecarttype(periode[dimension]))
+    return (e)
+# print (ecarttype1(variable))
+
+def maximum1(dimension):
+    maxi=[]
+    for i in range (1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        maxi.append(maximum(periode[dimension]))
+    return (maxi)
+# print (maximum1(variable))
+
+def minimum1(dimension):
+    mini=[]
+    for i in range (1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        mini.append(minimum(periode[dimension]))
+    return (mini)
     
 if len(sys.argv)==5:
     variable=sys.argv[2]
@@ -111,7 +153,6 @@ if len(sys.argv)==5:
     if str(sys.argv)[1]=='displayStat':
         id1=tab[tab['id']==1]
         plt.axhline(y=moyenne(id1[variable]))
-        plt.gca.set('Date', variable)
         plt.title('Graphe de notre variable en fonction du temps avec ses valeurs stats')
         plt.show()
         print('Pour', variable)
