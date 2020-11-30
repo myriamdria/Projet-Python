@@ -28,8 +28,8 @@ variable= 'humidity'
 variable1= 'temp'
 variable2= 'humidity'
 # variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
-start_date = '2019-08-12'
-end_date= '2019-08-13'
+start_date = '2019-08-20'
+end_date= '2019-08-21'
 
 
 # def convtime2(strtime):
@@ -184,7 +184,7 @@ def ecarttype1(dimension):
 
 
 ###Trouver les capteurs similaires selon la variable
-dimension='co2' 
+dimension='lum' 
 
 
 
@@ -199,6 +199,15 @@ print ('Les capteurs',df_sort1.tolist(), 'sont similaires')
 print ('Avec pour moyennes, respectivement', df_sort2.tolist(), 'pour', dimension)
 
 
+for i in df_sort1.tolist():
+    idi = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+    periode = idi[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+    plt.plot(periode[dimension]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+plt.legend(df_sort1.tolist())
+for j in df_sort2.tolist():
+    plt.axhline(j)
+plt.legend(df_sort1.tolist()) 
+plt.show()
 
 
 
