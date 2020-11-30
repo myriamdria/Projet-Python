@@ -19,7 +19,7 @@ tab1['duree']= [convtime(i) for i in tab1.sent_at]
 # # print (tab1)
 # tab1
 
-print (tab1)
+
 #Rajoutons une colonne dans notre fichier correspondant à l'indice humidex
 a=17.27   #coefficients utiles pour le calcul de humidex
 b=237.7
@@ -36,27 +36,36 @@ tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15
 #on créer une liste pour légender plus facilement nos graphes
 capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
 
-#Déterminons le temps d'occupation de bureaux
-tab1['date'] = pd.to_datetime(tab1['sent_at']).dt.date
-tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time
-tab1['heure'] = pd.to_datetime(tab1['sent_at']).dt.hour
+###############Déterminons le temps d'occupation de bureaux####################
+#On rajoute des colonnes pour une meilleure visibilité des horaires
+tab1['date'] = pd.to_datetime(tab1['sent_at']).dt.date  #Une colonne avec juste les dates
+tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time  #Une colonne avec juste l'heure
+tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()     #jour correspondant à la date donnée
 
-# tab1['annee'] = pd.to_datetime(tab1['date']).dt.year
-# tab1['mois'] = pd.to_datetime(tab1['date']).dt.month
-# tab1['jour'] = pd.to_datetime(tab1['date']).dt.day
-tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()
-print (tab1)
+#On crée deux tableaux avec uniquement les donnéees précédemments ajoutés
+#Le premier permet d'avoir quand la journée débute
+t1 = {'date': tab1['date'], 'debut' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+tf1 = pd.DataFrame(data=t1) 
+tf1.drop_duplicates(subset='date', keep='first', inplace=True) #on supprime 
+#toutes les lignes dont la date apparait en doublon excepté la première pour 
+#connaitre l'horaire de début de journée pour chaque jour
+ 
+#Le deuxième, quand la journée se termine
+t2 = {'date': tab1['date'], 'fin' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+tf2 = pd.DataFrame(data=t2)
+tf2.drop_duplicates(subset='date', keep='last', inplace=True)#on supprime 
+#toutes les lignes dont la date apparait en doublon excepté la dernière pour 
+#connaitre l'heure de la fin de journée pour chaque jour
 
-jour=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-for i in jour:
-    occupation = tab1[tab1['jour_de_la_semaine'] == i]
-    horaire = occupation['date'].unique()
-    heure = occupation['heure']
-    print (i, ':',horaire, heure)
-    
+#On affiche nos résultats
+print ('Les périodes doccupations de bureaux')
+print ('Les journées commencent à :')
+print (tf1)
 
-print ('Les jours doccupations du bureaux sont:',tab1['jour_de_la_semaine'].unique())
-print ('Du',tab1['date'].unique()[0],'au',tab1['date'].unique()[-1] )
+print ('Puis se terminent à:')
+print (tf2)
+
+##############################################################################
 
 #On entre la variable des données qui nous intéressent avec les dates qui nous intéresse
 # variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
@@ -78,12 +87,6 @@ end_date = '2019-08-14'
 # start_date = input('entrer une date sous la forme AAAA-MM-JJ:')
 # end_date= input('entrer une date sous la forme AAAA-MM-JJ:')
     
-
-
-def convtime2(strtime):
-    """Converts a time "HH:MM:SS" as a time in sec"""
-    moment = datetime.strptime(strtime, 'H:%M:%S+02:00')
-    return calendar.timegm(moment.timetuple())
 
 
 ##Afficher le graphe d'une variable pour nos différents capteurs sur une periode donnée##
@@ -161,10 +164,11 @@ def correlation(Liste1,Liste2):
 # print ('ecart type est:', ecarttype(tab[variable]))
 # print ('moyenne',moyenne(tab[variable]))
 
-##Trouver les similarités##
 
+###Fonctions permettant de créer une liste de nos données statistiques de chaque
+#variable pour une variable demandée
 
-def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque capteur
+def moyenne1(dimension):  #déterminer la moyenne d'une variable pour chaque capteur
     moy1=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
@@ -173,7 +177,7 @@ def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque 
     return (moy1)
 # print (moyenne1(variable))
 
-def median1(dimension):
+def median1(dimension):     #déterminer la médiane d'une variable pour chaque capteur
     med=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
@@ -182,7 +186,7 @@ def median1(dimension):
     return (med)
 # print (median1(variable))
 
-def ecarttype1(dimension):
+def ecarttype1(dimension):  #déterminer l'écart-type d'une variable pour chaque capteur
     e=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
@@ -191,7 +195,7 @@ def ecarttype1(dimension):
     return (e)
 # print (ecarttype1(variable))
 
-def maximum1(dimension):
+def maximum1(dimension):    #déterminer le maximum d'une variable pour chaque capteur
     maxi=[]
     for i in range (1,7):
         idn = tab[tab['id'] == i]
@@ -200,28 +204,31 @@ def maximum1(dimension):
     return (maxi)
 # print (maximum1(variable))
 
-def minimum1(dimension):
+def minimum1(dimension):    #déterminer le minimum d'une variable pour chaque capteur
     mini=[]
     for i in range (1,7):
         idn = tab[tab['id'] == i]
         periode = idn[start_date : end_date]
         mini.append(minimum(periode[dimension]))
     return (mini)
-###Rechercher les capteurs similaires selon la variable
+
+
+
+###Création d'un tableur donnant les valeurs statistiques de chaque capteur###
 print ('Pour', variable,', on a ces valeurs statistiques:')
 d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)], 'maximum':[i for i in maximum1(variable)], 'mimumum':[i for i in minimum1(variable)] }
 df = pd.DataFrame(data=d)
 print(df)
 
-df_sort1= df.id[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]   #on récupérer les numéros de capteurs similaires par rapport à leur moyenne
-df_sort2= df.moyenne[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les moyennes de capteurs similaires par rapport à leur moyenne
-df_sort3= df.ecart_type[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur moyenne
-df_sort4= df.id[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
-df_sort5= df.ecart_type[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:3]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
-df_sort0= df.id[(df['maximum']-moyenne(maximum1(variable))).abs().argsort()[:2]]
+# df_sort1= df.id[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]   #on récupérer les numéros de capteurs similaires par rapport à leur moyenne
+# df_sort2= df.moyenne[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les moyennes de capteurs similaires par rapport à leur moyenne
+# df_sort3= df.ecart_type[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur moyenne
+# df_sort4= df.id[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
+# df_sort5= df.ecart_type[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:3]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
+# df_sort0= df.id[(df['maximum']-moyenne(maximum1(variable))).abs().argsort()[:2]]
 # df_sort.id.tolist()
 
-print ('Les capteurs',df_sort0.tolist(), 'sont similaires vis à vis de', variable)
+# print ('Les capteurs',df_sort0.tolist(), 'sont similaires vis à vis de', variable)
 # print ('Avec pour moyennes, respectivement', df_sort2.tolist(), 'pour', variable)
 # print ('Avec pour ecartype, respectivement', df_sort3.tolist(), 'pour', variable)
 
@@ -242,12 +249,7 @@ print ('Les capteurs',df_sort0.tolist(), 'sont similaires vis à vis de', variab
 
 
 #Traçons tous les capteurs similaires
-id1=tab[tab['id']==1]
-id2=tab[tab['id']==2]
-id3=tab[tab['id']==3]
-id4=tab[tab['id']==4]
-id5=tab[tab['id']==5]
-id6=tab[tab['id']==6] 
+
 # print ('Les capteurs 2 et 4 sont similaires par rapport à la température en se basant sur leur moyenne')
 # print ('Par lecture graphique et avec les valeurs statistiques, on a aussi que 1, 3, 2 et 4 le sont aussi)
 
@@ -282,22 +284,23 @@ def plus_proche(liste, valeur):
     idx = (np.abs(liste-valeur)).argmin()
     return (liste[idx])
 
-# cx1 = id1[variable]
-# cx2 = id2[variable]
-# cx3 = id3[variable]
-# cx4 = id4[variable]
-# cx5 = id5[variable]
-# cx6 = id6[variable]
+
+####Afficher la moyenne d'une variable sur un graphe pour chaque capteur####
+id1=tab[tab['id']==1]
+id2=tab[tab['id']==2]
+id3=tab[tab['id']==3]
+id4=tab[tab['id']==4]
+id5=tab[tab['id']==5]
+id6=tab[tab['id']==6] 
+
 fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
 fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
 cx1.plot(id1[variable])
 cx1.axhline(moyenne(id1[variable]))
 cx1.legend([moyenne(id1[variable])], loc='best')
-# cx1.set_ylabel(variable)
 cx2.plot(id2[variable])
 cx2.axhline(moyenne(id1[variable]))
 cx2.legend([moyenne(id2[variable])], loc='best')
-# plt.legend(moyenne(id2[variable]))
 cx2.set_ylabel(variable)
 cx3.plot(id3[variable])
 cx3.axhline(moyenne(id3[variable]))
