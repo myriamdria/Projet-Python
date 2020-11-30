@@ -21,16 +21,13 @@ tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15
 
 
 
-capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
-#Entrer la variable qui nous intéresse#
-# variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
-# start_date = '2019-08-23'
-# end_date= '2019-08-24'
+
 
 print ("Nombre d'arguments:", len(sys.argv), "arguments")
 print ("Liste des arguments:", str(sys.argv))
 
-
+#Pour notre légende#
+capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
 
 if len(sys.argv)==3:
     variable=sys.argv[2]
@@ -152,15 +149,45 @@ if len(sys.argv)==5:
         plt.show() #Afficher le graphe d'une variable pour nos différents capteurs
     if str(sys.argv)[1]=='displayStat':
         id1=tab[tab['id']==1]
-        plt.axhline(y=moyenne(id1[variable]))
-        plt.title('Graphe de notre variable en fonction du temps avec ses valeurs stats')
+        id2=tab[tab['id']==2]
+        id3=tab[tab['id']==3]
+        id4=tab[tab['id']==4]
+        id5=tab[tab['id']==5]
+        id6=tab[tab['id']==6]
+        fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
+        fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
+        cx1.plot(id1[variable])
+        cx1.axhline(moyenne(id1[variable]))
+        cx1.legend([moyenne(id1[variable])], loc='best')
+        cx2.plot(id2[variable])
+        cx2.axhline(moyenne(id1[variable]))
+        cx2.legend([moyenne(id2[variable])], loc='best')
+        cx2.set_ylabel(variable)
+        cx3.plot(id3[variable])
+        cx3.axhline(moyenne(id3[variable]))
+        cx3.legend([moyenne(id3[variable])], loc='best')
+        cx3.set_xlabel('temps')
+        plt.show()
+        fig ,(cx4,cx5,cx6)=plt.subplots(3,1,sharex='col')
+        fig.suptitle('Courbe capteur 4,5 et 6 avec la moyenne')
+        cx4.plot(id4[variable])
+        cx4.axhline(moyenne(id4[variable]))
+        cx4.legend([moyenne(id4[variable])], loc='best')
+        cx5.plot(id5[variable])
+        cx5.axhline(moyenne(id5[variable]))
+        cx5.legend([moyenne(id5[variable])], loc='best')
+        cx5.set_ylabel(variable)
+        cx6.plot(id6[variable])
+        cx6.axhline(moyenne(id6[variable]))
+        cx6.legend([moyenne(id6[variable])], loc='best')
+        cx6.set_xlabel('temps')
         plt.show()
         print('Pour', variable)
-        print('Le minimum est', minimum(tab[variable]))
-        print('Le maximum est', maximum(tab[variable]))
-        print('La moyenne est', moyenne(tab[variable]))
+        print('Le minimum est(dans lordre des numéros des capteurs)', minimum1(tab[variable]))
+        print('Le maximum est', maximum1(tab[variable]))
+        print('La moyenne est:', moyenne1[tab[variable]])
         print('La variance est', variance(tab[variable]))
-        print('''L'ecarttype est''', ecarttype(tab[variable]))
+        print('''L'ecarttype est''', ecarttype1(tab[variable]))
         
 if len(sys.argv)==6:
     variable1=sys.argv[2]
@@ -173,29 +200,5 @@ if len(sys.argv)==6:
         print ("l'indice de corrélation entre",variable1, "et", variable2, "est:", correlation(donnee[variable1],donnee[variable2]))
 
 
-##Trouver les similarités##
-
-
-# id1=tab[tab['id']==1]
-# id2=tab[tab['id']==2]
-# id3=tab[tab['id']==3]
-# id4=tab[tab['id']==4]
-# id5=tab[tab['id']==5]
-# id6=tab[tab['id']==6]   
-
-# donnee = id1[start_date:end_date] 
-# print ("L'indice de corrélation du capteur 1 entre la température et l'humidité est:",correlation(donnee['temp'],donnee['humidity']))
-# print (correlation(id1['temp'],id1['humidity']))
-
-# id1_temperature = id1['temp']
-# periode3 = id3['2019-08-23':'2019-08-24']
-# periode2 = id2['2019-08-23':'2019-08-24']
-# periode5 = id5['2019-08-23':'2019-08-24']
-# print (id1_temperature)
-# print (periode['temp'])
-# plt.plot(periode3['lum'])
-# plt.plot(periode2['lum'])
-# plt.plot(periode5['lum'])
-# plt.show()
-
+#
 
