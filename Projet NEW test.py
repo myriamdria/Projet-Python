@@ -6,13 +6,20 @@ from datetime import datetime
 import calendar
 
 
+def convtime(strtime):
+    """Converts a string date "YYYY-MM-DD HH;MM;SS" as a time in sec"""
+    moment = datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S+02:00')
+    return calendar.timegm(moment.timetuple())
+
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
 # print (tab)
 tab1 = pd.read_csv('EIVP_KM.csv', sep=';')
-tab1
+tab1['duree']= [convtime(i) for i in tab1.sent_at]
+# # print (tab1)
+# tab1
 
-
+print (tab1)
 #Rajoutons une colonne dans notre fichier correspondant à l'indice humidex
 a=17.27   #coefficients utiles pour le calcul de humidex
 b=237.7
@@ -32,15 +39,21 @@ capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6'
 #Déterminons le temps d'occupation de bureaux
 tab1['date'] = pd.to_datetime(tab1['sent_at']).dt.date
 tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time
+tab1['heure'] = pd.to_datetime(tab1['sent_at']).dt.hour
+
 # tab1['annee'] = pd.to_datetime(tab1['date']).dt.year
 # tab1['mois'] = pd.to_datetime(tab1['date']).dt.month
 # tab1['jour'] = pd.to_datetime(tab1['date']).dt.day
 tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()
 print (tab1)
 
-oc= tab1['date'].unique()
-# occupation = pd.DataFrame(data=oc)
-# print (oc)
+jour=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+for i in jour:
+    occupation = tab1[tab1['jour_de_la_semaine'] == i]
+    horaire = occupation['date'].unique()
+    heure = occupation['heure']
+    print (i, ':',horaire, heure)
+    
 
 print ('Les jours doccupations du bureaux sont:',tab1['jour_de_la_semaine'].unique())
 print ('Du',tab1['date'].unique()[0],'au',tab1['date'].unique()[-1] )
@@ -82,7 +95,7 @@ plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capte
 plt.title('Courbes de chaque capteur en fonction du temps')
 plt.xlabel('date')
 plt.ylabel(variable)
-plt.show()
+plt.show()  #afficher notre graphe avec les différentes courbes
 
 # for i in range(1,7):
 #     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
@@ -264,5 +277,52 @@ id6=tab[tab['id']==6]
 # plt.xlabel('date')
 # plt.show()
 
+def plus_proche(liste, valeur):
+    liste = np.asarray(liste)
+    idx = (np.abs(liste-valeur)).argmin()
+    return (liste[idx])
 
+# cx1 = id1[variable]
+# cx2 = id2[variable]
+# cx3 = id3[variable]
+# cx4 = id4[variable]
+# cx5 = id5[variable]
+# cx6 = id6[variable]
+fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
+fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
+cx1.plot(id1[variable])
+cx1.axhline(moyenne(id1[variable]))
+cx1.legend([moyenne(id1[variable])], loc='best')
+# cx1.set_ylabel(variable)
+cx2.plot(id2[variable])
+cx2.axhline(moyenne(id1[variable]))
+cx2.legend([moyenne(id2[variable])], loc='best')
+# plt.legend(moyenne(id2[variable]))
+cx2.set_ylabel(variable)
+cx3.plot(id3[variable])
+cx3.axhline(moyenne(id3[variable]))
+cx3.legend([moyenne(id3[variable])], loc='best')
+cx3.set_xlabel('temps')
+plt.show()
+fig ,(cx4,cx5,cx6)=plt.subplots(3,1,sharex='col')
+fig.suptitle('Courbe capteur 4,5 et 6 avec la moyenne')
+cx4.plot(id4[variable])
+cx4.axhline(moyenne(id4[variable]))
+cx4.legend([moyenne(id4[variable])], loc='best')
+cx5.plot(id5[variable])
+cx5.axhline(moyenne(id5[variable]))
+cx5.legend([moyenne(id5[variable])], loc='best')
+cx5.set_ylabel(variable)
+cx6.plot(id6[variable])
+cx6.axhline(moyenne(id6[variable]))
+cx6.legend([moyenne(id6[variable])], loc='best')
+cx6.set_xlabel('temps')
+plt.show()
+# for i in range(6):
+#     sim=[]
+#     moy=[]
+#     depart=
+#     moy[0]=depart[i]
+    
+#     for j in 
     
