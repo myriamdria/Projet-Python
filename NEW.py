@@ -111,7 +111,7 @@ if len(sys.argv)==5:
     if str(sys.argv)[1]=='displayStat':
         id1=tab[tab['id']==1]
         plt.axhline(y=moyenne(id1[variable]))
-        plt.legend(plt.axhline(y=moyenne(periode[variable])), ['moyenne de la variable'])
+        plt.gca.set('Date', variable)
         plt.title('Graphe de notre variable en fonction du temps avec ses valeurs stats')
         plt.show()
         print('Pour', variable)
