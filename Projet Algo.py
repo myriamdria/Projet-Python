@@ -8,13 +8,17 @@ import calendar
 
 tab = pd.read_csv('EIVP_KM.csv', sep=';', index_col = 'sent_at',parse_dates = True)
 tab
-# print (tab)
+
+
 tab1 = pd.read_csv('EIVP_KM.csv', sep=';')
 tab1
 
+################Définition de l'indice humidex################################
 
 #Rajoutons une colonne dans notre fichier correspondant à l'indice humidex
-a=17.27   #coefficients utiles pour le calcul de humidex
+
+#coefficients utiles pour le calcul de humidex
+a=17.27   
 b=237.7
 
 def alpha(T,humid):
@@ -26,65 +30,26 @@ def temprose(T,humid): #calcul de la température de rosée
 #on ajoute une colonne pour notre indice humidex
 tab['humidex']= tab['temp']+0.5555*(6.11*np.exp(5417.7530*((1/273.16)-(1/(273.15 + temprose(tab['temp'],tab['humidity'])))))-10)
 
-#on créer une liste pour légender plus facilement nos graphes
-capteur=['capteur 1','capteur 2','capteur 3','capteur 4','capteur 5','capteur 6']
-
-#
-tab1['Date'] = pd.to_datetime(tab1['sent_at']).dt.date
-tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time
-# print (tab)
-
-#Rajoutons une colonne avec les jours de la semaine correspondant aux dates
-# tab1['jour'] = tab1['Date'].strftime('%Y-%m-%d')
-# # tab1['jour'] = datetime.tab1['Date'].weekday()
-# print (tab1.jour)
-
-#On entre la variable des données qui nous intéressent avec les dates qui nous intéresse
-variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
-if variable == 'humidex':
-        print (tab.humidex)
-        for i in range(1,7):
-            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-            plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-        plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
-        plt.title('Variation pour chaque capteur en fonction du temps')
-        plt.ylabel(variable)
-        plt.xlabel('date')
-        plt.show()
+###############################################################################
 
 
 
-# start_date = input('entrer une date sous la forme AAAA-MM-JJ:')
-# end_date= input('entrer une date sous la forme AAAA-MM-JJ:')
-    
-
-
+##################Convertisseur de date en durée (secondes)####################
 def convtime2(strtime):
-    """Converts a time "HH:MM:SS" as a time in sec"""
-    moment = datetime.strptime(strtime, 'H:%M:%S+02:00')
-    return calendar.timegm(moment.timetuple())
+    """Convertir l'heure donnée "HH:MM:SS" en seconde"""
+    instant = datetime.strptime(strtime, 'H:%M:%S+02:00')
+    return calendar.timegm(instant.timetuple())
+
+def convtime(date):
+    """Convertir une date "YYYY-MM-DD HH;MM;SS" en une durée en sec"""
+    instant = datetime.strptime(date, '%Y-%m-%d %H:%M:%S+02:00')
+    return calendar.timegm(instant.timetuple())
+
+###############################################################################
 
 
-##Afficher le graphe d'une variable pour nos différents capteurs sur une periode donnée##
-# for i in range(1,7):
-#     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-#     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-#     plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-# plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
-# plt.title('Courbes de chaques en fonction du temps en fonction du temps')
-# plt.axes().set(xlabel= 'Date', ylabel=variable)
-# plt.show()
 
-for i in range(1,7):
-    idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-    plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
-plt.title('Variation pour chaque capteur en fonction du temps')
-plt.ylabel(variable)
-plt.xlabel('date')
-plt.show() 
-
-##Les valeurs statistiques###
+############Fonctions pour déterminer les valeurs statistiques#################
 def minimum(Liste):
     mini=Liste[0]
     for i in Liste:
@@ -125,23 +90,20 @@ def ecarttype(Liste):
     return (variance(Liste)**(1/2))
 
 def covariance(Liste1,Liste2):
-    if len(Liste1) == len(Liste2):
-        m1= moyenne(Liste1)
-        m2= moyenne(Liste2)
-        S=0
-        for i in range(len(Liste1)):
-            S += (Liste1[i]-m1)*(Liste2[i]-m2)
-        return (S/len(Liste1))
+    if len(Liste1) != len(Liste2):
+        return ('prendre un rautre intervalle')
+    m1= moyenne(Liste1)
+    m2= moyenne(Liste2)
+    S=0
+    for i in range(len(Liste1)):
+        S += (Liste1[i]-m1)*(Liste2[i]-m2)
+    return (S/(len(Liste1)-1))
 
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
 
-# print ('ecart type est:', ecarttype(tab[variable]))
-# print ('moyenne',moyenne(tab[variable]))
 
-##Trouver les similarités##
-
-
+###Mettre les valeurs statistiques de chaque capteur dans une liste###########
 def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque capteur
     moy1=[]
     for i in range(1,7):
@@ -166,62 +128,182 @@ def ecarttype1(dimension):
     return (e)
 # print (ecarttype1('temp'))
 
-###Rechercher les capteurs similaires selon la variable
-
-d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)] }
-df = pd.DataFrame(data=d)
+###############################################################################
 
 
-df_sort1= df.id[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]   #on récupérer les numéros de capteurs similaires par rapport à leur moyenne
-df_sort2= df.moyenne[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les moyennes de capteurs similaires par rapport à leur moyenne
-df_sort3= df.ecart_type[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur moyenne
-df_sort4= df.id[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
-df_sort5= df.ecart_type[(df['ecart_type']-moyenne(ecarttype1(variable))).abs().argsort()[:2]]  #on récupérer les écart-types des capteurs similaires par rapport à leur écart-type
-# df_sort.id.tolist()
+######################Partie Similarité#######################################
+L=['noise','humidity','lum','temp','co2']  #Création d'une liste de caractéristiques évaluées par nos capteurs
 
-print ('Les capteurs',df_sort1.tolist(), 'sont similaires vis à vis de', variable)
-print ('Avec pour moyennes, respectivement', df_sort2.tolist(), 'pour', variable)
-print ('Avec pour ecartype, respectivement', df_sort3.tolist(), 'pour', variable)
+def normalise(valeur,variable): #Normaliser les valeurs
+    mini=minimum(variable)
+    maxi=maximum(variable)
+    return ((valeur-mini)/(maxi-mini))
 
-#Courbes des capteurs qui sont similaires par rapport à leur valeur statistique
-for i in df_sort1.tolist():
-    idi = tab[tab['id'] == i] #on sélectionne le tableau correspond aux capteurs similaires
-    # periode = idi[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse
-    plt.plot(idi[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée
-plt.axhline(df_sort2.tolist()[0])   #on trace la moyenne de nos capteurs
-plt.axhline(df_sort2.tolist()[1], c='y')
-legend1= plt.legend(df_sort1.tolist(), title = 'Capteur',loc='upper right')
-plt.gca().add_artist(legend1)
-plt.legend(df_sort2.tolist(), title = 'Moyenne', loc = 'best')
-plt.title('Les capteurs similaires en fonction du temps') 
-plt.ylabel(variable)
-plt.xlabel('date')
-plt.show()
+for mesure in L: #On va comparer nos capteurs par rapport à chacune de leurs caractéristiques mesurées
+    for i in range(1,7): #On a 6 capteurs à comparer
+        id1 = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+        # periode1= id1[start_date : end_date]
+        n1= len(id1) #nombre de ligne
+        for j in range(i+1,7): #On compare le capteur i avec le capteur i+1
+            sim=[]  #On initialise une liste vide qui nous donnera pour chaque variable leur similitude
+            norm_distance=[]    #Initialise une liste vide qui contiendra les distances normalisés
+            compteur=0
+            id2 = tab[tab['id'] == j]   #Les données du capteur i+1
+            # periode2 = id2[start_date : end_date]
+            n2 = len(id2)  #nombre de ligne
+            m=[]    #liste vide qui contiendra les distances entre chaque point
+            if n1 > n2 :    #on vérifie qu'on prend uniquement le nombre d'élément de la plus petite liste pour comparer 2 listes
+                n= n2
+            else:
+                n= n1
+            for k in range(n):  #on calcule l'écart entre chaque point
+                m.append((abs(id2[mesure][k]-id1[mesure][k])))  #qu'on ajoute dans notre liste
+            # print (m)
+            for valeur in m:
+                norm_distance.append(normalise(valeur,m)) #on normalise les distances trouvés qui sont non similaires
+            for non_similaire in norm_distance:
+                sim.append((1-non_similaire))   
+            for seuil in sim:   #On détermine si les valeurs sont similaires
+                if seuil > 0.86:    #Notre seuil de similarité
+                    compteur+=1     #Si similaire on ajoute 1 à notre compteur
+                else:
+                    compteur+=0     #sinon non
+            if compteur > 0.75*n:   #On considère que nos deux capteurs sont similaires si plus de trois quart de nos valeurs sont similaires
+                print ('Les capteurs', i, 'et', j, 'sont similaires par rapport à',mesure)
+                plt.plot(id1[mesure])
+                plt.plot(id2[mesure])
+                plt.title('Les capteurs similaires')
+                plt.legend([i,j])
+                plt.ylabel(mesure)
+                plt.xlabel('date')
+                plt.xticks(rotation = 'vertical')
+                plt.show()
+
+
+##############################Partie utilisateur##############################
+
+action = input('Que souhaitez-vous faire ? (diplay/displayStat/correlation)')
+ 
+if action == 'correlation' :
+    variable1 = input('Quelle est la première variable ?(noise/humidity/lum/temp/co2/humidex)')
+    variable2 =input('Quelle est la seconde variable ? (noise/humidity/lum/temp/co2/humidex)')
+    start_date = input('Entrer une date de début sous la forme AAAA-MM-JJ:')
+    end_date = input('Entrer une date de fin sous la forme AAAA-MM-JJ:')
+    for i in range (1,7):
+        id1= tab[tab['id']== i]
+        donnee = id1[start_date:end_date] 
+        print ('indice de corrélation pour le capteur',i,'entre',variable1, 'et', variable2, 'est:', correlation(donnee[variable1],donnee[variable2]))
+
+
+if action == 'display' :
+    variable=input('Pour quelle variable ? (noise/humidity/lum/temp/co2/humidex)')
+    if variable=='humidex' :
+        print (tab.humidex)
+        for i in range(1,7):
+            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+            plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+        plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+        plt.title('Variation pour chaque capteur en fonction du temps')
+        plt.ylabel(variable)
+        plt.xlabel('date')
+        plt.xticks(rotation = 'vertical')
+        plt.show()
+        # for i in range(1,7):
+        #     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+        #     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+        #     plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+        # plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+        # plt.title('Courbes de chaques en fonction du temps en fonction du temps')
+        # plt.axes().set(xlabel= 'Date', ylabel=variable)
+        # plt.show()
+    start_date = input('Entrer une date de début sous la forme AAAA-MM-JJ:')
+    end_date= input('Entrer une date de fin sous la forme AAAA-MM-JJ:')
+    for i in range(1,7):
+        idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+        plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+        plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+        plt.title('Variation pour chaque capteur en fonction du temps')
+        plt.ylabel(variable)
+        plt.xlabel('date')
+        plt.xticks(rotation = 'vertical')
+        plt.show() 
+     
+if action == 'displayStat':
+    d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)] }
+    df = pd.DataFrame(data=d)
+    print (df)
+    id1=tab[tab['id']==1]
+    id2=tab[tab['id']==2]
+    id3=tab[tab['id']==3]
+    id4=tab[tab['id']==4]
+    id5=tab[tab['id']==5]
+    id6=tab[tab['id']==6] 
+    fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
+    fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
+    cx1.plot(id1[variable])
+    cx1.axhline(moyenne(id1[variable]))
+    cx1.legend([moyenne(id1[variable])], loc='best')
+    # cx1.set_ylabel(variable)
+    cx2.plot(id2[variable])
+    cx2.axhline(moyenne(id1[variable]))
+    cx2.legend([moyenne(id2[variable])], loc='best')
+    # plt.legend(moyenne(id2[variable]))
+    cx2.set_ylabel(variable)
+    cx3.plot(id3[variable])
+    cx3.axhline(moyenne(id3[variable]))
+    cx3.legend([moyenne(id3[variable])], loc='best')
+    cx3.set_xlabel('temps')
+    plt.xticks(rotation = 'vertical')
+    plt.show()
+    fig ,(cx4,cx5,cx6)=plt.subplots(3,1,sharex='col')
+    fig.suptitle('Courbe capteur 4,5 et 6 avec la moyenne')
+    cx4.plot(id4[variable])
+    cx4.axhline(moyenne(id4[variable]))
+    cx4.legend([moyenne(id4[variable])], loc='best')
+    cx5.plot(id5[variable])
+    cx5.axhline(moyenne(id5[variable]))
+    cx5.legend([moyenne(id5[variable])], loc='best')
+    cx5.set_ylabel(variable)
+    cx6.plot(id6[variable])
+    cx6.axhline(moyenne(id6[variable]))
+    cx6.legend([moyenne(id6[variable])], loc='best')
+    cx6.set_xlabel('temps')
+    plt.xticks(rotation = 'vertical')
+    plt.show()
 
 
 
-# tab_sort = tab.id[(tab[variable]-moyenne(moyenne1(variable))).abs().argsort()[:2]]
-# print ('Les capteurs',tab_sort.tolist(), 'sont similaires vis à vis de', variable)
-# # print ('Avec pour moyennes, respectivement', df_sort2.tolist(), 'pour', dimension)
-# # print ('Avec pour ecartype, respectivement', df_sort4.tolist(), 'pour', dimension)
-# for i in tab_sort.tolist():
-#     idi = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-#     # periode = idi[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-#     plt.plot(idi[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-# plt.axhline(df_sort2.tolist()[0])   #on trace la moyenne de nos capteurs
-# plt.axhline(df_sort2.tolist()[1], c='y')
-# legend1= plt.legend(df_sort1.tolist(), title = 'Capteur',loc='upper right')
-# plt.gca().add_artist(legend1)
-# plt.legend(df_sort2.tolist(), title = 'Moyenne', loc = 'best')
-# plt.title('Les capteurs similaires en fonction du temps') 
-# plt.ylabel(variable)
-# plt.xlabel('date')
-# plt.show()
 
-        
+          
+###############Déterminons le temps d'occupation de bureaux####################
+# #On rajoute des colonnes pour une meilleure visibilité des horaires
+# tab1['date'] = pd.to_datetime(tab1['sent_at']).dt.date  #Une colonne avec juste les dates
+# tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time  #Une colonne avec juste l'heure
+# tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()     #jour correspondant à la date donnée
 
-            
-              
+# #On crée deux tableaux avec uniquement les donnéees précédemments ajoutés
+# #Le premier permet d'avoir quand la journée débute
+# t1 = {'date': tab1['date'], 'debut' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+# tf1 = pd.DataFrame(data=t1) 
+# tf1.drop_duplicates(subset='date', keep='first', inplace=True) #on supprime 
+# #toutes les lignes dont la date apparait en doublon excepté la première pour 
+# #connaitre l'horaire de début de journée pour chaque jour
+ 
+# #Le deuxième, quand la journée se termine
+# t2 = {'date': tab1['date'], 'fin' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+# tf2 = pd.DataFrame(data=t2)
+# tf2.drop_duplicates(subset='date', keep='last', inplace=True)#on supprime 
+# #toutes les lignes dont la date apparait en doublon excepté la dernière pour 
+# #connaitre l'heure de la fin de journée pour chaque jour
+
+# #On affiche nos résultats
+# print ('Les périodes doccupations de bureaux')
+# print ('Les journées commencent à :')
+# print (tf1)
+# print ('Puis se terminent à:')
+# print (tf2)
+
+##############################################################################              
 
 
 
