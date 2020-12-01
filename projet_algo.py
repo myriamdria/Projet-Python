@@ -210,6 +210,42 @@ for mesure in L: #On va comparer nos capteurs par rapport à chacune de leurs ca
 
 ##############################################################################
 
+
+##################Périodes d'occupation des bureaux############################
+
+#On rajoute des colonnes pour une meilleure visibilité des horaires
+tab1['date'] = pd.to_datetime(tab1['sent_at']).dt.date  #Une colonne avec juste les dates
+tab1['Time'] = pd.to_datetime(tab1['sent_at']).dt.time  #Une colonne avec juste l'heure
+tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()     #jour correspondant à la date donnée
+
+#On crée deux tableaux avec uniquement les donnéees précédemments ajoutés
+#Le premier permet d'avoir quand la journée débute
+t1 = {'id' : tab1['id'],'jour': tab1['jour_de_la_semaine'], 'date': tab1['date'], 'heures' : tab1['Time'],  'bruit': tab1['noise'] }
+tf1 = pd.DataFrame(data=t1) #on met tout ça sous forme d'un tableau
+tf1.drop(tf1[tf1.bruit <40].index, inplace = True) #on supprime les lignes dont le bruit est inférieur à 40dB
+tf1.drop(tf1[tf1.id != 3].index, inplace = True)
+tf1.drop_duplicates(subset='date', keep='first', inplace =True)     #toutes les lignes dont la date apparait en doublon excepté la première pour 
+                                                                    #connaitre l'horaire de début de journée pour chaque jour
+ 
+#Le deuxième, quand la journée se termine
+t2 = {'id' : tab1['id'],'jour': tab1['jour_de_la_semaine'], 'date': tab1['date'], 'heures' : tab1['Time'],  'bruit': tab1['noise'] }
+tf2 = pd.DataFrame(data=t1) #on met tout ça sous forme d'un tableau
+tf2.drop(tf2[tf2.bruit <40].index, inplace = True) #on supprime les lignes dont le bruit est inférieur à 40dB
+tf2.drop(tf2[tf2.id != 3].index, inplace = True)
+tf2.drop_duplicates(subset='date', keep='last', inplace=True)   #on supprime toutes les lignes dont la date apparait en doublon excepté la dernière pour 
+                                                                #connaitre l'heure de la fin de journée pour chaque jour
+
+
+#On affiche nos résultats
+print ('Les journées commencent à:')
+print (tf1)
+print ('Et se terminent à:')
+print (tf2)
+
+print('Les deux tableaux du dessus nous donne les horaires d occupations des bureaux')
+print('Les bureaux sont occupés de façon général, du mercredi au dimanche')
+print('Mercredi 8h30-18h, jeudi 9h-18h, vendredi 9h-19h30, samedi 9h-17h30, dimanche 8h20-18h  ')
+
 #################Partie utilisateur############################################     
 
 print ('Ecrire sous forme: python projet_algo.py action variable start_date end_date')
