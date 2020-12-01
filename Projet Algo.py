@@ -104,29 +104,58 @@ def correlation(Liste1,Liste2):
 
 
 ###Mettre les valeurs statistiques de chaque capteur dans une liste###########
-def moyenne1(dimension):  ##déterminer les moyennes d'une variable pour chaque capteur
+def moyenne1(dimension):  #déterminer la moyenne d'une variable pour chaque capteur
     moy1=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
+        # periode = idn[start_date : end_date]
         moy1.append(moyenne(idn[dimension]))
     return (moy1)
-# print (moyenne1('co2'))
+# print (moyenne1(variable))
 
-def median1(dimension):
+def median1(dimension):     #déterminer la médiane d'une variable pour chaque capteur
     med=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
-        med.append(mediane(idn[dimension]))
+        periode = idn[start_date : end_date]
+        med.append(mediane(periode[dimension]))
     return (med)
-# print (median1('temp'))
+# print (median1(variable))
 
-def ecarttype1(dimension):
+def ecarttype1(dimension):  #déterminer l'écart-type d'une variable pour chaque capteur
     e=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
-        e.append(ecarttype(idn[dimension]))
+        periode = idn[start_date : end_date]
+        e.append(ecarttype(periode[dimension]))
     return (e)
-# print (ecarttype1('temp'))
+# print (ecarttype1(variable))
+
+def maximum1(dimension):    #déterminer le maximum d'une variable pour chaque capteur
+    maxi=[]
+    for i in range (1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        maxi.append(maximum(periode[dimension]))
+    return (maxi)
+# print (maximum1(variable))
+
+def minimum1(dimension):    #déterminer le minimum d'une variable pour chaque capteur
+    mini=[]
+    for i in range (1,7):
+        idn = tab[tab['id'] == i]
+        # periode = idn[start_date : end_date]
+        mini.append(minimum(idn[dimension]))
+    return (mini)
+
+def variance1(dimension):  #déterminer l'écart-type d'une variable pour chaque capteur
+    v=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        # periode = idn[start_date : end_date]
+        v.append(variance(idn[dimension]))
+    return (v)
+
 
 ###############################################################################
 
@@ -182,7 +211,7 @@ for mesure in L: #On va comparer nos capteurs par rapport à chacune de leurs ca
 
 ##############################Partie utilisateur##############################
 
-action = input('Que souhaitez-vous faire ? (diplay/displayStat/correlation)')
+action = input('Que souhaitez-vous faire ? (diplay/displayStat/correlation):')
  
 if action == 'correlation' :
     variable1 = input('Quelle est la première variable ?(noise/humidity/lum/temp/co2/humidex)')
@@ -196,7 +225,8 @@ if action == 'correlation' :
 
 
 if action == 'display' :
-    variable=input('Pour quelle variable ? (noise/humidity/lum/temp/co2/humidex)')
+    variable=input('Pour quelle variable ? (noise/humidity/lum/temp/co2/humidex):')
+
     if variable=='humidex' :
         print (tab.humidex)
         for i in range(1,7):
@@ -208,29 +238,34 @@ if action == 'display' :
         plt.xlabel('date')
         plt.xticks(rotation = 'vertical')
         plt.show()
-        # for i in range(1,7):
-        #     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-        #     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-        #     plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
-        # plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
-        # plt.title('Courbes de chaques en fonction du temps en fonction du temps')
-        # plt.axes().set(xlabel= 'Date', ylabel=variable)
-        # plt.show()
-    start_date = input('Entrer une date de début sous la forme AAAA-MM-JJ:')
-    end_date= input('Entrer une date de fin sous la forme AAAA-MM-JJ:')
-    for i in range(1,7):
-        idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
-        plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+
+
+    else:
+        end_date= input('(optionnel)Entrer une date de fin sous la forme AAAA-MM-JJ:')    
+        start_date = input('(optionnel)Entrer une date de début sous la forme AAAA-MM-JJ:')
+        for i in range(1,7):
+            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+            periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+            plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
         plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
-        plt.title('Variation pour chaque capteur en fonction du temps')
-        plt.ylabel(variable)
-        plt.xlabel('date')
-        plt.xticks(rotation = 'vertical')
-        plt.show() 
+        plt.title('Capteurs en fonction du temps, de la période donnée')
+        plt.axes().set(xlabel= 'Date', ylabel=variable)
+        plt.show()
+    
+        for i in range(1,7):
+            idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+            plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+            plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+            plt.title('Variation pour chaque capteur en fonction du temps')
+            plt.ylabel(variable)
+            plt.xlabel('date')
+            plt.xticks(rotation = 'vertical')
+            plt.show() 
      
 if action == 'displayStat':
     d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)] }
     df = pd.DataFrame(data=d)
+    print ('Pour', variable)
     print (df)
     id1=tab[tab['id']==1]
     id2=tab[tab['id']==2]
