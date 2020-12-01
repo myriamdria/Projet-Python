@@ -241,7 +241,9 @@ print (tf1)
 print ('Et se terminent à:')
 print (tf2)
 
-print('Les deux tableaux du dessus nous donne les périodes d')
+print('Les deux tableaux du dessus nous donne les horaires d occupations des bureaux')
+print('Les bureaux sont occupés de façon général, du mercredi au dimanche')
+print('Mercredi 8h30-18h, jeudi 9h-18h, vendredi 9h-19h30, samedi 9h-17h30, dimanche 8h20-18h  ')
 
 
 ##############################Partie utilisateur##############################
