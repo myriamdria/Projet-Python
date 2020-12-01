@@ -67,6 +67,7 @@ print (tf2)
 ##############################################################################
 
 #On entre la variable des données qui nous intéressent avec les dates qui nous intéresse
+# action = input('entrer une chaîne de caractère display, displayStat ou correlation:)
 # variable = input('entrer une chaîne de caractère soit noise,humidity,lum,temp,co2,humidex:')
 # if variable == 'humidex':
 #         print (tab.humidex)
@@ -80,8 +81,8 @@ print (tf2)
 #         plt.show()
 
 variable='noise'
-start_date ='2019-08-13'
-end_date = '2019-08-14'
+start_date ='2019-08-16'
+end_date = '2019-08-17'
 
 # start_date = input('entrer une date sous la forme AAAA-MM-JJ:')
 # end_date= input('entrer une date sous la forme AAAA-MM-JJ:')
@@ -92,13 +93,15 @@ end_date = '2019-08-14'
 for i in range(1,7):
     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
-    plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+    plt.plot(periode[variable][0:50]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
 plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
 plt.title('Courbes de chaque capteur en fonction du temps')
 plt.xlabel('date')
 plt.ylabel(variable)
 plt.show()  #afficher notre graphe avec les différentes courbes
 
+# L=['noise','humidity','lum','temp','co2']
+# for variable in L:
 # for i in range(1,7):
 #     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
 #     plt.plot(idn[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
@@ -168,8 +171,8 @@ def moyenne1(dimension):  #déterminer la moyenne d'une variable pour chaque cap
     moy1=[]
     for i in range(1,7):
         idn = tab[tab['id'] == i]
-        periode = idn[start_date : end_date]
-        moy1.append(moyenne(periode[dimension]))
+        # periode = idn[start_date : end_date]
+        moy1.append(moyenne(idn[dimension]))
     return (moy1)
 # print (moyenne1(variable))
 
@@ -204,17 +207,23 @@ def minimum1(dimension):    #déterminer le minimum d'une variable pour chaque c
     mini=[]
     for i in range (1,7):
         idn = tab[tab['id'] == i]
-        periode = idn[start_date : end_date]
-        mini.append(minimum(periode[dimension]))
+        # periode = idn[start_date : end_date]
+        mini.append(minimum(idn[dimension]))
     return (mini)
 
-
+def variance1(dimension):  #déterminer l'écart-type d'une variable pour chaque capteur
+    v=[]
+    for i in range(1,7):
+        idn = tab[tab['id'] == i]
+        periode = idn[start_date : end_date]
+        v.append(variance(periode[dimension]))
+    return (v)
 
 ###Création d'un tableur donnant les valeurs statistiques de chaque capteur###
-print ('Pour', variable,', on a ces valeurs statistiques:')
-d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)], 'maximum':[i for i in maximum1(variable)], 'mimumum':[i for i in minimum1(variable)] }
-df = pd.DataFrame(data=d)
-print(df)
+# print ('Pour', variable,', on a ces valeurs statistiques:')
+# d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)], 'maximum':[i for i in maximum1(variable)], 'mimumum':[i for i in minimum1(variable)], 'variance':[i for i in variance1(variable)] }
+# df = pd.DataFrame(data=d)
+# print(df)
 
 # df_sort1= df.id[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]   #on récupérer les numéros de capteurs similaires par rapport à leur moyenne
 # df_sort2= df.moyenne[(df['moyenne']-moyenne(moyenne1(variable))).abs().argsort()[:2]]  #on récupérer les moyennes de capteurs similaires par rapport à leur moyenne
@@ -282,46 +291,128 @@ def plus_proche(liste, valeur):
 
 
 ####Afficher la moyenne d'une variable sur un graphe pour chaque capteur####
-id1=tab[tab['id']==1]
-id2=tab[tab['id']==2]
-id3=tab[tab['id']==3]
-id4=tab[tab['id']==4]
-id5=tab[tab['id']==5]
-id6=tab[tab['id']==6] 
+# id1=tab[tab['id']==1]
+# id2=tab[tab['id']==2]
+# id3=tab[tab['id']==3]
+# id4=tab[tab['id']==4]
+# id5=tab[tab['id']==5]
+# id6=tab[tab['id']==6] 
 
-fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
-fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
-cx1.plot(id1[variable])
-cx1.axhline(moyenne(id1[variable]))
-cx1.legend([moyenne(id1[variable])], loc='best')
-cx2.plot(id2[variable])
-cx2.axhline(moyenne(id1[variable]))
-cx2.legend([moyenne(id2[variable])], loc='best')
-cx2.set_ylabel(variable)
-cx3.plot(id3[variable])
-cx3.axhline(moyenne(id3[variable]))
-cx3.legend([moyenne(id3[variable])], loc='best')
-cx3.set_xlabel('temps')
-plt.show()
-fig ,(cx4,cx5,cx6)=plt.subplots(3,1,sharex='col')
-fig.suptitle('Courbe capteur 4,5 et 6 avec la moyenne')
-cx4.plot(id4[variable])
-cx4.axhline(moyenne(id4[variable]))
-cx4.legend([moyenne(id4[variable])], loc='best')
-cx5.plot(id5[variable])
-cx5.axhline(moyenne(id5[variable]))
-cx5.legend([moyenne(id5[variable])], loc='best')
-cx5.set_ylabel(variable)
-cx6.plot(id6[variable])
-cx6.axhline(moyenne(id6[variable]))
-cx6.legend([moyenne(id6[variable])], loc='best')
-cx6.set_xlabel('temps')
-plt.show()
-# for i in range(6):
-#     sim=[]
-#     moy=[]
-#     depart=
-#     moy[0]=depart[i]
-    
-#     for j in 
-    
+# fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
+# fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
+# cx1.plot(id1[variable])
+# cx1.axhline(moyenne(id1[variable]))
+# cx1.legend([moyenne(id1[variable])], loc='best')
+# cx2.plot(id2[variable])
+# cx2.axhline(moyenne(id1[variable]))
+# cx2.legend([moyenne(id2[variable])], loc='best')
+# cx2.set_ylabel(variable)
+# cx3.plot(id3[variable])
+# cx3.axhline(moyenne(id3[variable]))
+# cx3.legend([moyenne(id3[variable])], loc='best')
+# cx3.set_xlabel('temps')
+# plt.show()
+# fig ,(cx4,cx5,cx6)=plt.subplots(3,1,sharex='col')
+# fig.suptitle('Courbe capteur 4,5 et 6 avec la moyenne')
+# cx4.plot(id4[variable])
+# cx4.axhline(moyenne(id4[variable]))
+# cx4.legend([moyenne(id4[variable])], loc='best')
+# cx5.plot(id5[variable])
+# cx5.axhline(moyenne(id5[variable]))
+# cx5.legend([moyenne(id5[variable])], loc='best')
+# cx5.set_ylabel(variable)
+# cx6.plot(id6[variable])
+# cx6.axhline(moyenne(id6[variable]))
+# cx6.legend([moyenne(id6[variable])], loc='best')
+# cx6.set_xlabel('temps')
+# plt.show()
+
+###Similarité des capteurs###
+
+L=['noise','humidity','lum','temp','co2']
+
+for mesure in L:
+    for i in range(1,7):
+        id1 = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+        periode1= id1[start_date : end_date]
+        n1= len(periode1)
+        compteur=0
+        cap=[]
+        for j in range(i+1,6):
+            sim=[]
+            id2 = tab[tab['id'] == j]
+            periode2 = id2[start_date : end_date]
+            n2 = len(periode2)
+            m=[]
+            for k in range(n1):
+                m.append(abs(periode2[mesure][k]-periode1[mesure][k]))
+                for valeur in m:
+                    if valeur <= 1:
+                        compteur+=1
+                    else:
+                        compteur+=0
+            if compteur > (n1):
+                sim.append(i)
+                sim.append(j)
+                cap.append(sim)
+                print ('Les capteurs', sim, 'sont similaires par rapport à', mesure)
+            
+# id1 = tab[tab['id'] == 1] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+# periode1= id1[start_date : end_date]
+# print (periode1[variable][2])
+
+# ind=[1,2,3,4,5]
+# for mesure in L:
+#     for i in range(1,7):
+#         id1 = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+#         periode1= id1[start_date : end_date]
+#         n1= len(periode1)
+#         compteur=0
+#         for j in range(i+1,6):
+#             sim=[]
+#             id2 = tab[tab['id'] == j]
+#             periode2 = id2[start_date : end_date]
+#             n2 = len(periode2)
+#             m=[]
+#             for k in range(n2):
+#                 if periode1[mesure][k] == periode2[mesure][k]:
+#                     compteur+=1
+#                 else:
+#                     compteur+=0
+#             if compteur >= (0.75*n1):
+#                 sim.append(i)
+#                 sim.append(j)
+#                 L.append(sim)
+#                 print ('Les capteurs', sim, 'sont similaires par rapport à', mesure)
+            
+        
+#######Capteurs similaires par rapport aux bruits#############################
+# variable = 'temp'
+# for i in range(1,7):
+#     idn = tab[tab['id'] == i] #on sélectionne que les données d'un capteur 1,2,3,4,5 ou 6"
+#     periode = idn[ start_date : end_date ] #on choisit notre intervalle de temps qui nous intéresse"
+#     plt.plot(periode[variable]) #On trace le graphe de la donnée qui nous intéresse sur la période demandée"
+# plt.legend(['capteur 1', 'capteur 2', 'capteur 3','capteur 4','capteur 5','capteur 6']) #légende par numéro de capteur"
+# plt.title('Courbes de chaque capteur en fonction du temps')
+# plt.xlabel('date')
+# plt.tight_layout()
+# plt.plot
+# plt.ylabel(variable)
+# plt.show()  #afficher notre graphe avec les différentes courbes
+
+# plt.plot(id2[variable])
+# plt.plot(id4[variable])
+# plt.title('Capteurs similaires')
+# plt.xlabel('date')
+# plt.xticks(rotation = 'vertical')
+# plt.ylabel('bruit dB')
+# plt.show()
+# print ('Pour', variable,', on a ces valeurs statistiques:')
+# d = {'id':[i for i in range (1,7)], 'moyenne':[i for i in moyenne1(variable)], 'ecart_type':[i for i in ecarttype1(variable)], 'mediane':[i for i in median1(variable)], 'maximum':[i for i in maximum1(variable)], 'mimumum':[i for i in minimum1(variable)], 'variance':[i for i in variance1(variable)] }
+# df = pd.DataFrame(data=d)
+# print(df)
+
+# print('Similarité')
+# print('Les capteurs 2 et 4 sont similaires par rapport aux bruits')
+# print('Les capteurs 1 et 3 sont similaires par rapport à la température')
+# print('')
