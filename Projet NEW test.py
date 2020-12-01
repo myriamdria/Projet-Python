@@ -5,6 +5,10 @@ import numpy as np
 from datetime import datetime
 import calendar
 
+def convtime3(strtime):
+    """Converts a time "AAAA-MM-DD" as a time in sec"""
+    moment = datetime.strptime(strtime, '%Y-%m-%d')
+    return calendar.timegm(moment.timetuple())
 
 def convtime(strtime):
     """Converts a string date "YYYY-MM-DD HH;MM;SS" as a time in sec"""
@@ -18,7 +22,7 @@ tab1 = pd.read_csv('EIVP_KM.csv', sep=';')
 tab1['duree']= [convtime(i) for i in tab1.sent_at]
 # # print (tab1)
 # tab1
-
+print (tab1)
 
 #Rajoutons une colonne dans notre fichier correspondant à l'indice humidex
 a=17.27   #coefficients utiles pour le calcul de humidex
@@ -44,25 +48,30 @@ tab1['jour_de_la_semaine'] = pd.to_datetime(tab1['date']).dt.day_name()     #jou
 
 #On crée deux tableaux avec uniquement les donnéees précédemments ajoutés
 #Le premier permet d'avoir quand la journée débute
-t1 = {'date': tab1['date'], 'debut' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+t1 = {'date': tab1['date'], 'debut' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'], 'bruit': tab1['noise'] }
 tf1 = pd.DataFrame(data=t1) 
-tf1.drop_duplicates(subset='date', keep='first', inplace=True) #on supprime 
+tf1.drop(tf1[tf1.bruit <40].index) #on supprime 
 #toutes les lignes dont la date apparait en doublon excepté la première pour 
 #connaitre l'horaire de début de journée pour chaque jour
  
 #Le deuxième, quand la journée se termine
-t2 = {'date': tab1['date'], 'fin' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'] }
+t2 = {'date': tab1['date'], 'fin' : tab1['Time'], 'jour': tab1['jour_de_la_semaine'], 'bruit': tab1['noise'] }
 tf2 = pd.DataFrame(data=t2)
-tf2.drop_duplicates(subset='date', keep='last', inplace=True)#on supprime 
+tf2.drop(tf2[tf2.bruit > 40].index)
+# tf2.drop_duplicates(subset='date', keep='last', inplace=True)#on supprime 
 #toutes les lignes dont la date apparait en doublon excepté la dernière pour 
 #connaitre l'heure de la fin de journée pour chaque jour
 
 #On affiche nos résultats
-print ('Les périodes doccupations de bureaux')
-print ('Les journées commencent à :')
-print (tf1)
-print ('Puis se terminent à:')
-print (tf2)
+# print ('Les périodes doccupations de bureaux')
+# print ('Les journées commencent à :')
+# print (tf1)
+# print ('Puis se terminent à:')
+# print (tf2)
+
+
+
+
 
 ##############################################################################
 
@@ -152,13 +161,14 @@ def ecarttype(Liste):
     return (variance(Liste)**(1/2))
 
 def covariance(Liste1,Liste2):
-    if len(Liste1) == len(Liste2):
-        m1= moyenne(Liste1)
-        m2= moyenne(Liste2)
-        S=0
-        for i in range(len(Liste1)):
-            S += (Liste1[i]-m1)*(Liste2[i]-m2)
-        return (S/len(Liste1))
+    if len(Liste1) != len(Liste2):
+        return ('prendre un rautre intervalle')
+    m1= moyenne(Liste1)
+    m2= moyenne(Liste2)
+    S=0
+    for i in range(len(Liste1)):
+        S += (Liste1[i]-m1)*(Liste2[i]-m2)
+    return (S/(len(Liste1)-1))
 
 def correlation(Liste1,Liste2):
     return (covariance(Liste1,Liste2)/(ecarttype(Liste1)*ecarttype(Liste2)))
@@ -291,12 +301,12 @@ def plus_proche(liste, valeur):
 
 
 ####Afficher la moyenne d'une variable sur un graphe pour chaque capteur####
-# id1=tab[tab['id']==1]
-# id2=tab[tab['id']==2]
-# id3=tab[tab['id']==3]
-# id4=tab[tab['id']==4]
-# id5=tab[tab['id']==5]
-# id6=tab[tab['id']==6] 
+id1=tab[tab['id']==1]
+id2=tab[tab['id']==2]
+id3=tab[tab['id']==3]
+id4=tab[tab['id']==4]
+id5=tab[tab['id']==5]
+id6=tab[tab['id']==6] 
 
 # fig, (cx1,cx2,cx3)= plt.subplots(3,1, sharex='col')
 # fig.suptitle('Courbe capteur 1,2 et 3 avec la moyenne')
@@ -331,33 +341,97 @@ def plus_proche(liste, valeur):
 
 L=['noise','humidity','lum','temp','co2']
 
+def normalise(valeur,variable):
+    mini=minimum(variable)
+    maxi=maximum(variable)
+    return ((valeur-mini)/(maxi-mini))
+# id7 = tab1[tab1['id']==1]
+# start_duree= convtime3(start_date)
+# end_duree= convtime3(end_date)
 for mesure in L:
     for i in range(1,7):
         id1 = tab[tab['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
-        periode1= id1[start_date : end_date]
-        n1= len(periode1)
-        compteur=0
-        cap=[]
-        for j in range(i+1,6):
+        # periode1= id1[start_date : end_date]
+        n1= len(id1)
+        for j in range(i+1,7):
             sim=[]
+            norm_distance=[]
+            compteur=0
             id2 = tab[tab['id'] == j]
-            periode2 = id2[start_date : end_date]
-            n2 = len(periode2)
+            # periode2 = id2[start_date : end_date]
+            n2 = len(id2)
             m=[]
-            for k in range(n1):
-                m.append(abs(periode2[mesure][k]-periode1[mesure][k]))
-                for valeur in m:
-                    if valeur <= 1:
-                        compteur+=1
-                    else:
-                        compteur+=0
-            if compteur > (n1):
-                sim.append(i)
-                sim.append(j)
-                cap.append(sim)
-                print ('Les capteurs', sim, 'sont similaires par rapport à', mesure)
+            if n1 > n2 :
+                n= n2
+            else:
+                n= n1
+            for k in range(n):
+                m.append((abs(id2[mesure][k]-id1[mesure][k])))
+            # print (m)
+            for valeur in m:
+                norm_distance.append(normalise(valeur,m))
+            for non_similaire in norm_distance:
+                sim.append((1-non_similaire))
+            for seuil in sim:
+                if seuil > 0.86:
+                    compteur+=1
+                else:
+                    compteur+=0
+            if compteur > 0.75*n:
+                print ('Les capteurs', i, 'et', j, 'sont similaires par rapport à',mesure)
+                plt.plot(id1[mesure])
+                plt.plot(id2[mesure])
+                plt.title('Les capteurs similaires')
+                plt.legend([i,j])
+                plt.ylabel(mesure)
+                plt.xlabel('date')
+                plt.show()
+
+print ('Contrairement à ce qui est écrit les capteurs 3 et 5 ne sont pas similaires en comparant lallure des courbes')
+print('Mais la présence de nombreux zéros fausse le résultat')   
             
-# id1 = tab[tab['id'] == 1] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+# for mesure in L:
+#     for i in range(1,7):
+#         id1 = tab1[tab1['id'] == i] #on sélectionne que les données du capteur 1,2,3,4,5 ou 6
+#         periode1= id1[id1['date'] == start_date]
+#         # donnee1 = id1[mesure]
+#         donnee1=[]
+#         for valeur1 in id1[mesure]:
+#             donnee1.append(valeur1)
+#         n1= len(donnee1)
+#         print (donnee1)
+#         for j in range(1,7):
+#             sim=[]
+#             if j != i:
+#                 id2 = tab1[tab1['id'] == j]
+#                 # periode2 = id2[id2['date'] == '2019-08-12']
+#                 donnee2 = []
+#                 for valeur2 in id2[mesure]:
+#                     n2 = len(donnee2)
+#                     compteur=0
+#                 n2 = len(donnee2)
+#                 # print (n2)
+#                 if n1 != n2:
+#                     if n1 > n2:
+#                         while n1 != n2:
+#                             donnee2.append(0)
+#                             n2+=1
+#                         print(donnee2)
+#                     else:
+#                         while n1 != n2:
+#                             donnee1.append(0)
+#                             n1+=1
+#                         # print(donnee1)
+#                     comp = correlation(donnee1,donnee2)
+#                     if comp > 0.8 or comp < (-0.8):
+#                         print ('Les capteurs', i, 'et',j,' sont similaires par rapport à',mesure)
+#                 else:
+#                     comp = correlation(donnee1,donnee2)
+#                     if comp > 0.8 or comp < (-0.8):
+#                         print ('Les capteurs', i, 'et',j,' sont similaires par rapport à',mesure)
+                
+id1 = tab[tab['id'] == 1] #on sélectionne que les données du capteur 1
+
 # periode1= id1[start_date : end_date]
 # print (periode1[variable][2])
 
@@ -416,3 +490,5 @@ for mesure in L:
 # print('Les capteurs 2 et 4 sont similaires par rapport aux bruits')
 # print('Les capteurs 1 et 3 sont similaires par rapport à la température')
 # print('')
+
+
